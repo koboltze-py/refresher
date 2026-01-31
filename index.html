@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refresher 2026 - DRK Flughafen Köln</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-hidden {
+            display: none;
+        }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .comparison-slider {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-highlight {
+            background-color: #fef08a;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        
+        .checkbox-item {
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .warning-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .7;
+            }
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 50;
+        }
+        
+        .tab-button {
+            transition: all 0.2s ease;
+        }
+        
+        .slide-animation {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Back Button (hidden on dashboard) -->
+    <button id="backButton" class="back-button section-hidden bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-lg flex items-center gap-2" onclick="showDashboard()">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Zurück
+    </button>
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold">Refresher 2026</h1>
+                    <p class="text-blue-100 mt-1">DRK Flughafen Köln - Interaktive Schulung</p>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="w-full md:w-96">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Suche nach Begriffen (z.B. WCHR, Leihrollis)..." 
+                            class="w-full px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                            onkeyup="performSearch()"
+                        />
+                        <svg class="w-5 h-5 absolute right-3 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <div id="searchResults" class="mt-2 bg-white rounded-lg shadow-lg max-h-96 overflow-y-auto hidden"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Dashboard -->
+        <section id="dashboard" class="space-y-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Willkommen zur Schulung</h2>
+                <p class="text-gray-600 text-lg">Wählen Sie einen Themenbereich aus</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 0: Training Game -->
+                <div class="card-hover bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 text-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-teal-800" onclick="window.location.href='game.html'">
+                    <div class="mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-center">🎮 Training Game</h3>
+                    <p class="text-center opacity-90">6 Level mit allen Schulungsinhalten</p>
+                    <div class="mt-6 text-center">
+                        <span class="inline-block bg-white bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold">Spielend lernen</span>
+                    </div>
+                </div>
+
+                <!-- Card 0b: Mobile Guide -->
+                <div class="card-hover bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-purple-800" onclick="window.location.href='mobile.html'">
+                    <div class="mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-center">📖 Mobile Guide</h3>
+                    <p class="text-center opacity-90">Schritt-für-Schritt Anleitung</p>
+                    <div class="mt-6 text-center">
+                        <span class="inline-block bg-white bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-semibold">20 Schritte</span>
+                    </div>
+                </div>
+
+                <!-- Card 1: Aftech System -->
+                <div class="card-hover bg-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-blue-600" onclick="showSection('aftech')">
+                    <div class="text-blue-600 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3 text-center">1. Aftech System</h3>
+                    <p class="text-gray-600 text-center">Interaktiver Guide mit allen Systemschritten und Screenshots</p>
+                    <div class="mt-6 text-center">
+                        <span class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold">20 Screenshots</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Neues Konzept -->
+                <div class="card-hover bg-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-green-600" onclick="showSection('konzept')">
+                    <div class="text-green-600 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3 text-center">2. Neues Konzept</h3>
+                    <p class="text-gray-600 text-center">WCHR-Änderungen und neue EU-Verordnungen verstehen</p>
+                    <div class="mt-6 text-center">
+                        <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">Vorher-Nachher</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Alltag -->
+                <div class="card-hover bg-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-purple-600" onclick="showSection('alltag')">
+                    <div class="text-purple-600 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3 text-center">3. Alltag</h3>
+                    <p class="text-gray-600 text-center">Checklisten, Leihrollis-Warnung und wichtige Infos</p>
+                    <div class="mt-6 text-center">
+                        <span class="inline-block bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-semibold">Interaktiv</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Weitere Infos -->
+                <div class="card-hover bg-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-orange-600" onclick="showSection('weitere')">
+                    <div class="text-orange-600 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3 text-center">4. Weitere Info's</h3>
+                    <p class="text-gray-600 text-center">Non-Schengen, Hubwagen, Verhalten & mehr</p>
+                    <div class="mt-6 text-center">
+                        <span class="inline-block bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-semibold">Spezial</span>
+                    </div>
+                </div>
+
+                <!-- Card 5: Auto-Eko -->
+                <div class="card-hover bg-white rounded-xl shadow-lg p-8 cursor-pointer border-t-4 border-red-600" onclick="showSection('praesentation')">
+                    <div class="text-red-600 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3 text-center">5. Auto-Eko</h3>
+                    <p class="text-gray-600 text-center">Automatische Slideshow aller Schulungsinhalte</p>
+                    <div class="mt-6 text-center">
+                        <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-semibold">▶️ Auto-Play</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Aftech System -->
+        <section id="aftech" class="section-hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    Aftech System - Interaktiver Guide
+                </h2>
+                <p class="text-gray-600 mb-8">Folgen Sie den Schritten im Aftech System. Klicken Sie auf die Bilder für eine größere Ansicht.</p>
+                
+                <div class="image-gallery">
+                    <!-- Screenshots 1-20 -->
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image1.png" alt="Aftech Screenshot 1" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 1: Login-Bildschirm</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 1: Login</h4>
+                        <p class="text-sm text-gray-600">Melden Sie sich mit Ihren Zugangsdaten im Aftech System an.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image2.png" alt="Aftech Screenshot 2" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 2: Hauptmenü</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 2: Hauptmenü</h4>
+                        <p class="text-sm text-gray-600">Navigieren Sie zum Hauptmenü und wählen Sie die entsprechende Funktion.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image3.png" alt="Aftech Screenshot 3" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 3: Passagierdaten</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 3: Passagierdaten erfassen</h4>
+                        <p class="text-sm text-gray-600">Geben Sie die Passagierdaten korrekt ein.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image4.png" alt="Aftech Screenshot 4" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 4: Flugdaten</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 4: Flugdaten prüfen</h4>
+                        <p class="text-sm text-gray-600">Überprüfen Sie die Flugdaten auf Richtigkeit.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image5.png" alt="Aftech Screenshot 5" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 5: Service-Auswahl</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 5: Service auswählen</h4>
+                        <p class="text-sm text-gray-600">Wählen Sie den benötigten Service (z.B. WCHR, WCHC).</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image6.png" alt="Aftech Screenshot 6" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 6: Zeitplanung</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 6: Zeitplanung</h4>
+                        <p class="text-sm text-gray-600">Planen Sie die Service-Zeiten entsprechend ein.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image7.png" alt="Aftech Screenshot 7" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 7: Ressourcen zuweisen</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 7: Ressourcen zuweisen</h4>
+                        <p class="text-sm text-gray-600">Weisen Sie die benötigten Ressourcen zu.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image8.png" alt="Aftech Screenshot 8" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 8: Bestätigung</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 8: Bestätigung</h4>
+                        <p class="text-sm text-gray-600">Bestätigen Sie die Eingaben.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image9.png" alt="Aftech Screenshot 9" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 9: Dokumentation</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 9: Dokumentation</h4>
+                        <p class="text-sm text-gray-600">Dokumentieren Sie den Service-Vorgang.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image10.png" alt="Aftech Screenshot 10" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 10: Statusübersicht</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 10: Statusübersicht</h4>
+                        <p class="text-sm text-gray-600">Überprüfen Sie die Statusübersicht aller Services.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image11.png" alt="Aftech Screenshot 11" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 11: Änderungen vornehmen</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 11: Änderungen vornehmen</h4>
+                        <p class="text-sm text-gray-600">Bei Bedarf können Änderungen vorgenommen werden.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image12.png" alt="Aftech Screenshot 12" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 12: Kommunikation</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 12: Kommunikation</h4>
+                        <p class="text-sm text-gray-600">Kommunizieren Sie mit dem Team über das System.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image13.png" alt="Aftech Screenshot 13" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 13: Notizen hinzufügen</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 13: Notizen hinzufügen</h4>
+                        <p class="text-sm text-gray-600">Fügen Sie wichtige Notizen zum Vorgang hinzu.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image14.png" alt="Aftech Screenshot 14" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 14: Abschluss vorbereiten</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 14: Abschluss vorbereiten</h4>
+                        <p class="text-sm text-gray-600">Bereiten Sie den Abschluss des Vorgangs vor.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image15.png" alt="Aftech Screenshot 15" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 15: Qualitätskontrolle</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 15: Qualitätskontrolle</h4>
+                        <p class="text-sm text-gray-600">Führen Sie eine abschließende Qualitätskontrolle durch.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image16.png" alt="Aftech Screenshot 16" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 16: Übergabe</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 16: Übergabe</h4>
+                        <p class="text-sm text-gray-600">Übergeben Sie den Vorgang an das nächste Team.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image17.png" alt="Aftech Screenshot 17" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 17: Reporting</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 17: Reporting</h4>
+                        <p class="text-sm text-gray-600">Erstellen Sie die erforderlichen Reports.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image18.png" alt="Aftech Screenshot 18" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 18: Archivierung</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 18: Archivierung</h4>
+                        <p class="text-sm text-gray-600">Archivieren Sie die Dokumentation ordnungsgemäß.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image19.png" alt="Aftech Screenshot 19" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 19: Abschluss</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 19: Abschluss</h4>
+                        <p class="text-sm text-gray-600">Schließen Sie den Vorgang im System ab.</p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="bg-white rounded-lg mb-4 overflow-hidden aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <img src="image20.png" alt="Aftech Screenshot 20" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\'text-gray-400 text-sm\'>Bild 20: Logout</span>'">
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Schritt 20: Logout</h4>
+                        <p class="text-sm text-gray-600">Melden Sie sich ordnungsgemäß vom System ab.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Neues Konzept -->
+        <section id="konzept" class="section-hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Neues Konzept - Wichtige Änderungen
+                </h2>
+
+                <!-- WCHR Vorher-Nachher Vergleich -->
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">WCHR-Situation: Vorher-Nachher-Vergleich</h3>
+                    <p class="text-gray-600 mb-6">Die EU-Verordnung hat wichtige Änderungen für WCHR-Passagiere bei TK und FR mit sich gebracht.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- VORHER -->
+                        <div class="bg-red-50 border-2 border-red-300 rounded-xl p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="bg-red-500 text-white rounded-full p-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-red-800">FRÜHER</h4>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-white rounded-lg p-4">
+                                    <h5 class="font-semibold text-gray-800 mb-2">TK (Turkish Airlines)</h5>
+                                    <ul class="space-y-2 text-gray-700">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-500 mt-1">•</span>
+                                            <span>WCHR-Passagiere konnten alleine zum Gate gehen</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-500 mt-1">•</span>
+                                            <span>Selbstständiges Einsteigen war möglich</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-500 mt-1">•</span>
+                                            <span>Keine Boarding-Begleitung erforderlich</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-4">
+                                    <h5 class="font-semibold text-gray-800 mb-2">FR (Ryanair)</h5>
+                                    <ul class="space-y-2 text-gray-700">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-500 mt-1">•</span>
+                                            <span>WCHR-Passagiere konnten alleine zum Gate gehen</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-500 mt-1">•</span>
+                                            <span>Selbstständiges Einsteigen war möglich</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-500 mt-1">•</span>
+                                            <span>Keine Boarding-Begleitung erforderlich</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NACHHER -->
+                        <div class="bg-green-50 border-2 border-green-300 rounded-xl p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="bg-green-500 text-white rounded-full p-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-green-800">JETZT (NEU)</h4>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-white rounded-lg p-4">
+                                    <h5 class="font-semibold text-gray-800 mb-2">TK (Turkish Airlines)</h5>
+                                    <ul class="space-y-2 text-gray-700">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-500 mt-1">✓</span>
+                                            <span><strong>WCHR-Passagiere MÜSSEN geboardet werden</strong></span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-500 mt-1">✓</span>
+                                            <span>Begleitung bis zum Sitzplatz erforderlich</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-500 mt-1">✓</span>
+                                            <span>Neue EU-Verordnung verpflichtend</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-4">
+                                    <h5 class="font-semibold text-gray-800 mb-2">FR (Ryanair)</h5>
+                                    <ul class="space-y-2 text-gray-700">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-500 mt-1">✓</span>
+                                            <span><strong>WCHR-Passagiere MÜSSEN geboardet werden</strong></span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-500 mt-1">✓</span>
+                                            <span>Begleitung bis zum Sitzplatz erforderlich</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-500 mt-1">✓</span>
+                                            <span>Neue EU-Verordnung verpflichtend</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Important Notice -->
+                    <div class="mt-8 bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+                        <div class="flex items-start gap-4">
+                            <svg class="w-8 h-8 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div>
+                                <h5 class="font-bold text-blue-900 text-lg mb-2">Wichtig zu beachten:</h5>
+                                <p class="text-blue-800">Aufgrund der geänderten EU-Verordnung müssen ALLE WCHR-Passagiere bei TK und FR nun vollständig bis zum Sitzplatz geboardet werden. Dies gilt auch für Passagiere, die früher selbstständig einsteigen konnten. Bitte planen Sie entsprechend mehr Zeit ein!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Alltag -->
+        <section id="alltag" class="section-hidden space-y-8">
+            <!-- Leihrollis Warnung -->
+            <div class="warning-pulse bg-red-600 text-white rounded-xl shadow-2xl p-8 mb-8">
+                <div class="flex items-center gap-4 mb-4">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                        <h3 class="text-3xl font-bold">⚠️ WICHTIG: Leihrollis</h3>
+                        <p class="text-xl mt-2">Unten dürfen KEINE Rollis mehr stehen!</p>
+                    </div>
+                </div>
+                <p class="text-lg">Alle Leihrollstühle müssen nach Gebrauch ordnungsgemäß im dafür vorgesehenen Bereich oben abgestellt werden. Dies ist eine verbindliche Anweisung!</p>
+            </div>
+
+            <!-- Comic Story Link -->
+            <div class="bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400 rounded-xl shadow-2xl p-8 mb-8 hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+                <div class="text-center">
+                    <div class="text-6xl mb-4 animate-bounce">📚🎬</div>
+                    <h3 class="text-3xl font-bold text-white mb-4 drop-shadow-lg">
+                        Interaktive Comic-Story
+                    </h3>
+                    <p class="text-xl text-white mb-6 drop-shadow">
+                        Erlebe eine spannende Comic-Geschichte über den DRK-Alltag am Flughafen!
+                    </p>
+                    <p class="text-lg text-white mb-8 italic">
+                        Lerne über Leihrollis, Pünktlichkeit, Team-Unterschiede und mehr - auf unterhaltsame Art!
+                    </p>
+                    <a href="alltag-comic.html" class="inline-block bg-white text-orange-600 font-bold text-xl py-4 px-10 rounded-full shadow-xl hover:bg-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:scale-110">
+                        🚀 Comic-Story starten!
+                    </a>
+                </div>
+            </div>
+
+            <!-- Info Karten -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Pünktlichkeit -->
+                <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <h4 class="text-xl font-bold">Pünktlichkeit</h4>
+                        </div>
+                        <svg class="w-6 h-6 collapse-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-blue-100 mb-4">Pünktliches Erscheinen ist essentiell für den reibungslosen Ablauf.</p>
+                    <ul class="space-y-2 text-sm text-blue-50 collapse-content hidden">
+                        <li>• 15 Minuten vor Schichtbeginn da sein</li>
+                        <li>• Bei Verspätung sofort Bescheid geben</li>
+                        <li>• Übergabe rechtzeitig planen</li>
+                    </ul>
+                </div>
+
+                <!-- Tauschanträge -->
+                <div class="bg-gradient-to-br from-green-500 to-green-700 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                            </svg>
+                            <h4 class="text-xl font-bold">Tauschanträge</h4>
+                        </div>
+                        <svg class="w-6 h-6 collapse-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-green-100 mb-4">Schichttausch muss korrekt beantragt werden.</p>
+                    <ul class="space-y-2 text-sm text-green-50 collapse-content hidden">
+                        <li>• Mindestens 48h vorher beantragen</li>
+                        <li>• Tauschpartner finden und bestätigen</li>
+                        <li>• Genehmigung abwarten</li>
+                    </ul>
+                </div>
+
+                <!-- Krankmeldungen -->
+                <div class="bg-gradient-to-br from-orange-500 to-orange-700 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h4 class="text-xl font-bold">Krankmeldungen</h4>
+                        </div>
+                        <svg class="w-6 h-6 collapse-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-orange-100 mb-4">Bei Krankheit ist schnelles Handeln wichtig.</p>
+                    <ul class="space-y-2 text-sm text-orange-50 collapse-content hidden">
+                        <li>• Sofort telefonisch melden</li>
+                        <li>• Nicht per E-Mail oder SMS</li>
+                        <li>• AU-Bescheinigung nachreichen</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Weitere Wichtige Infos -->
+        <section id="weitere" class="section-hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <!-- Ankunft Non-Schengen -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-8 cursor-pointer hover:shadow-lg transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-blue-900">🌍 Ankunft Non-Schengen</h3>
+                        <svg class="w-6 h-6 collapse-icon transition-transform text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-blue-800 mb-4">Spezielle Regelungen für Passagiere aus Nicht-Schengen-Ländern:</p>
+                    <ul class="space-y-3 text-blue-700 collapse-content hidden">
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Besondere Aufmerksamkeit bei der Abfertigung erforderlich</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Dokumentenkontrolle ist obligatorisch</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Längere Wartezeiten einplanen</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Besondere Services koordinieren</span></li>
+                    </ul>
+                </div>
+
+                <!-- SP C72 -->
+                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-lg mb-8 cursor-pointer hover:shadow-lg transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-green-900">📍 SP C72</h3>
+                        <svg class="w-6 h-6 collapse-icon transition-transform text-green-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-green-800 mb-4">Wichtige Informationen zur Boarding-Position C72:</p>
+                    <ul class="space-y-3 text-green-700 collapse-content hidden">
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Spezielle Boarding-Abläufe beachten</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Koordination mit Ground Handling erforderlich</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Zeitliche Planung beachten</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Passagier-Sicherheit an erster Stelle</span></li>
+                    </ul>
+                </div>
+
+                <!-- 19er -->
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-6 rounded-lg mb-8 cursor-pointer hover:shadow-lg transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-purple-900">✈️ 19er (Gate 19)</h3>
+                        <svg class="w-6 h-6 collapse-icon transition-transform text-purple-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-purple-800 mb-4">Besonderheiten beim Gate 19:</p>
+                    <ul class="space-y-3 text-purple-700 collapse-content hidden">
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Spezielle Boarding-Prozeduren</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Enge Zusammenarbeit mit Flughafen erforderlich</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Besondere Aufmerksamkeit bei Services</span></li>
+                        <li class="flex gap-3"><span class="font-bold">•</span><span>Timing ist kritisch</span></li>
+                    </ul>
+                </div>
+
+                <!-- Verhalten & Hubwagen -->
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <!-- Verhalten -->
+                    <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg cursor-pointer hover:shadow-lg transition" onclick="toggleCollapse(this)">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-red-900">👥 Verhalten & Umgangsformen</h3>
+                            <svg class="w-6 h-6 collapse-icon transition-transform text-red-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                        </div>
+                        <ul class="space-y-3 text-red-700 text-sm collapse-content hidden">
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Professionelles Verhalten gegenüber Gästen</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Respektvolle Kommunikation</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Konflikte ruhig angehen</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Teamfähigkeit demonstrieren</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Kleidung und Hygiene beachten</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Hubwagen -->
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg cursor-pointer hover:shadow-lg transition" onclick="toggleCollapse(this)">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-yellow-900">🚛 Hubwagen (Tow Tractors)</h3>
+                            <svg class="w-6 h-6 collapse-icon transition-transform text-yellow-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                        </div>
+                        <ul class="space-y-3 text-yellow-700 text-sm collapse-content hidden">
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Sichere Bedienung erforderlich</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Nur von geschultem Personal</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Sicherheitsabstände einhalten</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Regelmäßige Wartung</span></li>
+                            <li class="flex gap-3"><span class="font-bold">•</span><span>Vorsicht beim Rangieren</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Neue Anweisungen Anmeldung -->
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-lg mb-8 cursor-pointer hover:shadow-lg transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-indigo-900">📝 Neue Anweisungen bezüglich Anmeldung</h3>
+                        <svg class="w-6 h-6 collapse-icon transition-transform text-indigo-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-indigo-800 mb-4 collapse-content hidden">Wichtige Änderungen bei der Anmeldung von Passagieren:</p>
+                    <div class="bg-white rounded-lg p-4 mb-4 collapse-content hidden">
+                        <p class="text-indigo-700 font-semibold mb-2">✓ Korrekte Anmeldung ist essentiell</p>
+                        <ul class="space-y-2 text-indigo-700 text-sm ml-4">
+                            <li>- Alle Daten müssen vollständig und korrekt sein</li>
+                            <li>- Double-Check durchführen</li>
+                            <li>- Fehler haben Konsequenzen</li>
+                            <li>- Im System sofort korrigieren</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 collapse-content hidden">
+                        <p class="text-red-700 font-semibold mb-2">⚠️ Häufige Fehler vermeiden</p>
+                        <ul class="space-y-2 text-indigo-700 text-sm ml-4">
+                            <li>- Tippfehler bei Namen</li>
+                            <li>- Falsche Dokumente</li>
+                            <li>- Unvollständige Angaben</li>
+                            <li>- Versäumte Deadline</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Grund / Hintergrund -->
+                <div class="bg-gray-50 border-l-4 border-gray-500 p-6 rounded-lg cursor-pointer hover:shadow-lg transition" onclick="toggleCollapse(this)">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-gray-900">💡 Grund & Hintergrund der Regelungen</h3>
+                        <svg class="w-6 h-6 collapse-icon transition-transform text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-800 mb-4 collapse-content hidden">Warum wurden diese neuen Regelungen eingeführt?</p>
+                    <div class="grid md:grid-cols-2 gap-4 collapse-content hidden">
+                        <div class="bg-white rounded-lg p-4">
+                            <p class="font-semibold text-gray-800 mb-2">🔒 Sicherheit</p>
+                            <p class="text-gray-700 text-sm">Die neuen EU-Verordnungen zielen auf erhöhte Sicherheitsstandards ab.</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4">
+                            <p class="font-semibold text-gray-800 mb-2">✈️ Compliance</p>
+                            <p class="text-gray-700 text-sm">Einhaltung internationaler Flughafenrichtlinien ist erforderlich.</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4">
+                            <p class="font-semibold text-gray-800 mb-2">👥 Passagiererlebnis</p>
+                            <p class="text-gray-700 text-sm">Besserer Service und Sicherheit für Fluggäste.</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4">
+                            <p class="font-semibold text-gray-800 mb-2">📊 Effizienz</p>
+                            <p class="text-gray-700 text-sm">Optimierte Prozesse für reibungslosen Ablauf.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Auto-Eko -->
+        <section id="praesentation" class="section-hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <!-- Presentation Controls -->
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Auto-Eko
+                    </h2>
+                    <div class="flex gap-3">
+                        <button onclick="pausePresentation()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"/>
+                            </svg>
+                            Pause
+                        </button>
+                        <button onclick="resumePresentation()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            </svg>
+                            Weiter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span id="slideCounter">Folie 1 von 33</span>
+                        <span id="timeRemaining">⏱️ ca. 2:45 Minuten verbleibend</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-red-500 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Slide Container -->
+                <div id="slideContainer" class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-12 min-h-[500px] flex flex-col items-center justify-center shadow-inner">
+                    <div id="slideContent" class="text-center max-w-4xl">
+                        <!-- Content wird dynamisch eingefügt -->
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-center gap-4 mt-6">
+                    <button onclick="previousSlide()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Zurück
+                    </button>
+                    <button onclick="nextSlide()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                        Weiter
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-300">© 2026 DRK Flughafen Köln - Refresher Schulung</p>
+            <p class="text-gray-400 text-sm mt-2">Für Rückfragen wenden Sie sich bitte an Ihre Teamleitung</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('dashboard').classList.add('section-hidden');
+            document.getElementById('aftech').classList.add('section-hidden');
+            document.getElementById('konzept').classList.add('section-hidden');
+            document.getElementById('alltag').classList.add('section-hidden');
+            document.getElementById('weitere').classList.add('section-hidden');
+            document.getElementById('praesentation').classList.add('section-hidden');
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('section-hidden');
+            
+            // Show back button
+            document.getElementById('backButton').classList.remove('section-hidden');
+            
+            // Start presentation if selected
+            if (sectionId === 'praesentation') {
+                startPresentation();
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function showDashboard() {
+            // Stop presentation if running
+            if (presentationInterval) {
+                clearInterval(presentationInterval);
+            }
+            
+            // Hide all sections
+            document.getElementById('aftech').classList.add('section-hidden');
+            document.getElementById('konzept').classList.add('section-hidden');
+            document.getElementById('alltag').classList.add('section-hidden');
+            document.getElementById('weitere').classList.add('section-hidden');
+            document.getElementById('praesentation').classList.add('section-hidden');
+            
+            // Show dashboard
+            document.getElementById('dashboard').classList.remove('section-hidden');
+            
+            // Hide back button
+            document.getElementById('backButton').classList.add('section-hidden');
+            
+            // Clear search
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Search functionality
+        const searchableContent = [
+            { term: 'WCHR', section: 'konzept', description: 'WCHR-Änderungen und neue EU-Verordnung' },
+            { term: 'Leihrollis', section: 'alltag', description: 'Wichtige Warnung zu Leihrollstühlen' },
+            { term: 'Rollstuhl', section: 'alltag', description: 'Wichtige Warnung zu Leihrollstühlen' },
+            { term: 'TK', section: 'konzept', description: 'Turkish Airlines WCHR-Regelungen' },
+            { term: 'Turkish', section: 'konzept', description: 'Turkish Airlines WCHR-Regelungen' },
+            { term: 'FR', section: 'konzept', description: 'Ryanair WCHR-Regelungen' },
+            { term: 'Ryanair', section: 'konzept', description: 'Ryanair WCHR-Regelungen' },
+            { term: 'EU-Verordnung', section: 'konzept', description: 'Neue EU-Verordnung für WCHR-Passagiere' },
+            { term: 'Aftech', section: 'aftech', description: 'Aftech System Guide mit 20 Screenshots' },
+            { term: 'System', section: 'aftech', description: 'Aftech System Guide' },
+            { term: 'Stadtteam', section: 'alltag', description: 'Checkliste für das Stadtteam' },
+            { term: 'Vorfeldteam', section: 'alltag', description: 'Checkliste für das Vorfeldteam' },
+            { term: 'Vorfeld', section: 'alltag', description: 'Checkliste für das Vorfeldteam' },
+            { term: 'Pünktlichkeit', section: 'alltag', description: 'Informationen zur Pünktlichkeit' },
+            { term: 'Tauschanträge', section: 'alltag', description: 'Infos zu Schichttausch' },
+            { term: 'Krankmeldung', section: 'alltag', description: 'Wie man sich korrekt krankmeldet' },
+            { term: 'Checkliste', section: 'alltag', description: 'Interaktive Checklisten für Teams' },
+            { term: 'Gate', section: 'konzept', description: 'Gate-Prozeduren und WCHR-Änderungen' },
+            { term: 'Boarding', section: 'konzept', description: 'Neue Boarding-Regelungen' },
+            // Weitere Infos Keywords
+            { term: 'Non-Schengen', section: 'weitere', description: 'Spezielle Regelungen für Non-Schengen Länder' },
+            { term: 'SP C72', section: 'weitere', description: 'Boarding-Position C72 Informationen' },
+            { term: '19er', section: 'weitere', description: 'Gate 19 spezielle Boarding-Prozeduren' },
+            { term: 'Hubwagen', section: 'weitere', description: 'Tow Tractors - sichere Bedienung erforderlich' },
+            { term: 'Anmeldung', section: 'weitere', description: 'Neue Anweisungen bezüglich Passagier-Anmeldung' },
+            { term: 'Verhalten', section: 'weitere', description: 'Professionelles Verhalten und Umgangsformen' },
+            { term: 'Dokumentenkontrolle', section: 'weitere', description: 'Obligatorische Kontrolle bei Non-Schengen' },
+            { term: 'Sicherheit', section: 'weitere', description: 'Sicherheitsstandards und EU-Verordnungen' }
+        ];
+
+        // Collapse/Expand Funktion für Info-Kacheln
+        function toggleCollapse(element) {
+            const collapseItems = element.querySelectorAll('.collapse-content');
+            const icon = element.querySelector('.collapse-icon');
+            
+            collapseItems.forEach(item => {
+                item.classList.toggle('hidden');
+            });
+            
+            if (icon) {
+                icon.style.transform = icon.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const searchResults = document.getElementById('searchResults');
+            
+            if (searchInput.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+            
+            const matches = searchableContent.filter(item => 
+                item.term.toLowerCase().includes(searchInput) || 
+                item.description.toLowerCase().includes(searchInput)
+            );
+            
+            if (matches.length > 0) {
+                searchResults.innerHTML = matches.map(match => `
+                    <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100" onclick="showSection('${match.section}')">
+                        <div class="font-semibold text-gray-800">${match.term}</div>
+                        <div class="text-sm text-gray-600">${match.description}</div>
+                    </div>
+                `).join('');
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.innerHTML = '<div class="p-3 text-gray-500 text-center">Keine Ergebnisse gefunden</div>';
+                searchResults.classList.remove('hidden');
+            }
+        }
+
+        // Checklisten
+        const stadttTeamItems = [
+            'Station öffnen und Bereiche kontrollieren',
+            'Material auf Vollständigkeit prüfen',
+            'Rollstühle und Gehhilfen überprüfen',
+            'Kommunikationsgeräte testen',
+            'Tagesplan und Flugzeiten checken',
+            'Übergabeprotokoll lesen',
+            'Kontakt mit Vorfeldteam aufnehmen',
+            'Besondere Vorkommnisse notieren'
+        ];
+
+        const vorfeldTeamItems = [
+            'Fahrzeuge auf Funktionsfähigkeit prüfen',
+            'Sicherheitsausrüstung kontrollieren',
+            'Ambulift überprüfen',
+            'Funkgeräte testen',
+            'Wetterbedingungen prüfen',
+            'Flugplan für den Tag durchgehen',
+            'Koordination mit Stadtteam',
+            'Leihrollis ordnungsgemäß verstauen'
+        ];
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+                btn.classList.add('text-gray-500');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('text-gray-500');
+            document.getElementById(`tab-${tabName}`).classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+        }
+
+        function createChecklist(containerId, items) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = items.map((item, index) => `
+                <div class="checkbox-item flex items-start gap-3 p-3 rounded-lg cursor-pointer" onclick="toggleCheckbox('${containerId}-${index}')">
+                    <input type="checkbox" id="${containerId}-${index}" class="w-5 h-5 mt-0.5 cursor-pointer" onchange="event.stopPropagation()">
+                    <label for="${containerId}-${index}" class="cursor-pointer flex-1">${item}</label>
+                </div>
+            `).join('');
+        }
+
+        function toggleCheckbox(id) {
+            const checkbox = document.getElementById(id);
+            checkbox.checked = !checkbox.checked;
+        }
+
+        function resetChecklist(containerId) {
+            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]`);
+            checkboxes.forEach(cb => cb.checked = false);
+        }
+
+        // Präsentations-Logik
+        let presentationInterval = null;
+        let currentSlideIndex = 0;
+        let isPaused = false;
+
+        const slides = [
+            { title: "Willkommen zum Refresher 2026", content: "Alle wichtigen Informationen kompakt präsentiert<br>DRK Flughafen Köln", emoji: "🎯", color: "from-blue-400 to-blue-600" },
+            
+            // Aftech System
+            { title: "1. Aftech System - Übersicht", content: "Passagierabfertigungs-System<br>20 detaillierte Screenshots für alle Prozesse", emoji: "💻", color: "from-blue-400 to-blue-600" },
+            { title: "Aftech - Login & Startseite", content: "Anmeldung mit Credentials<br>Hauptmenü Navigation<br>System-Übersicht", emoji: "🔐", color: "from-blue-400 to-blue-600" },
+            { title: "Aftech - Passagier Suche", content: "Suche nach Buchungsnummer<br>Name und Flugnummer eingeben<br>Passagierdaten abrufen", emoji: "🔍", color: "from-blue-400 to-blue-600" },
+            { title: "Aftech - Check-in Prozess", content: "Passagierdaten verifizieren<br>Sitzplatz auswählen<br>Gepäck registrieren", emoji: "✅", color: "from-blue-400 to-blue-600" },
+            { title: "Aftech - Sonderfälle", content: "WCHR Passagiere markieren<br>Unbegleitete Minderjährige<br>VIP Services", emoji: "⭐", color: "from-blue-400 to-blue-600" },
+            
+            // WCHR & Neues Konzept
+            { title: "2. WCHR - Neue EU-Verordnung", content: "Wichtige Änderungen ab 2026<br>Rollstuhl-Passagiere Betreuung", emoji: "♿", color: "from-green-400 to-green-600" },
+            { title: "WCHR - Turkish Airlines (TK)", content: "<strong>VORHER:</strong> Rollstuhl bis Gate<br><strong>NACHHER:</strong> Rollstuhl bis Flugzeug<br>Mehr Service erforderlich", emoji: "🇹🇷", color: "from-green-400 to-green-600" },
+            { title: "WCHR - Ryanair (FR)", content: "<strong>VORHER:</strong> Rollstuhl bis Gate<br><strong>NACHHER:</strong> Rollstuhl bis Flugzeug<br>Zusätzliche Koordination", emoji: "🇮🇪", color: "from-green-400 to-green-600" },
+            { title: "WCHR - Neue Anforderungen", content: "Frühere Anmeldung notwendig<br>Mehr Personal pro Flug<br>Bessere Kommunikation", emoji: "📋", color: "from-green-400 to-green-600" },
+            
+            // Stadtteam
+            { title: "3. Stadtteam - Aufgaben", content: "Terminal & Check-in Bereich<br>Haupthalle Tätigkeiten", emoji: "🏢", color: "from-purple-400 to-purple-600" },
+            { title: "Stadtteam - Check-in Support", content: "• Passagiere zu Schaltern leiten<br>• WCHR-Anmeldungen entgegennehmen<br>• Queue Management", emoji: "👥", color: "from-purple-400 to-purple-600" },
+            { title: "Stadtteam - Gate Services", content: "• Pre-Boarding koordinieren<br>• Boarding-Gruppen aufrufen<br>• Passagier-Zählung", emoji: "🚪", color: "from-purple-400 to-purple-600" },
+            { title: "Stadtteam - Terminal Betreuung", content: "• Lost & Found Unterstützung<br>• Informationsschalter<br>• Notfall-Koordination", emoji: "ℹ️", color: "from-purple-400 to-purple-600" },
+            
+            // Vorfeldteam
+            { title: "4. Vorfeldteam - Aufgaben", content: "Vorfeld & Flugzeug-Nähe<br>Aircraft Services", emoji: "✈️", color: "from-indigo-400 to-indigo-600" },
+            { title: "Vorfeldteam - Fahrzeug-Koordination", content: "• Vorfeld-Busse disponieren<br>• Rollstuhl-Hublift bedienen<br>• Gangway positionieren", emoji: "🚌", color: "from-indigo-400 to-indigo-600" },
+            { title: "Vorfeldteam - Boarding Support", content: "• Passagiere zum Flugzeug bringen<br>• Treppen-Assistenz<br>• Rollstuhl-Transfer", emoji: "🛫", color: "from-indigo-400 to-indigo-600" },
+            { title: "Vorfeldteam - Sicherheit", content: "• Sicherheitsabstände beachten<br>• Propeller/Triebwerke Vorsicht<br>• Westen & Gehörschutz tragen", emoji: "⚠️", color: "from-indigo-400 to-indigo-600" },
+            
+            // Leihrollis Warnung
+            { title: "⚠️ WICHTIG: Leihrollis", content: "NIEMALS selbstständig verwenden!<br><br><strong>Immer Disposition kontaktieren</strong><br>Falsche Nutzung = Konsequenzen", emoji: "🚫", color: "from-red-500 to-red-700" },
+            { title: "Leihrollis - Regeln", content: "• Nur nach Freigabe nutzen<br>• Korrekte Lagerung<br>• Schäden sofort melden<br>• Kein eigenmächtiges Handeln", emoji: "📜", color: "from-red-400 to-red-600" },
+            
+            // Alltag - Infokarten
+            { title: "5. Pünktlichkeit", content: "• 15 Min vor Schichtbeginn da sein<br>• Bei Verspätung sofort melden<br>• Übergabe rechtzeitig planen", emoji: "⏰", color: "from-blue-400 to-blue-600" },
+            { title: "6. Tauschanträge", content: "• Mindestens 48h vorher beantragen<br>• Tauschpartner finden & bestätigen<br>• Genehmigung abwarten", emoji: "🔄", color: "from-green-400 to-green-600" },
+            { title: "7. Krankmeldungen", content: "• Sofort telefonisch melden<br>• NICHT per E-Mail oder SMS<br>• AU-Bescheinigung nachreichen", emoji: "📞", color: "from-orange-400 to-orange-600" },
+            
+            // Weitere Infos
+            { title: "8. Ankunft Non-Schengen", content: "Besondere Aufmerksamkeit erforderlich<br>• Dokumentenkontrolle obligatorisch<br>• Längere Wartezeiten einplanen<br>• Services koordinieren", emoji: "🌍", color: "from-blue-400 to-blue-600" },
+            { title: "9. SP C72 - Boarding-Position", content: "Spezielle Boarding-Abläufe<br>• Ground Handling koordinieren<br>• Zeitliche Planung beachten<br>• Passagier-Sicherheit zuerst", emoji: "📍", color: "from-green-400 to-green-600" },
+            { title: "10. Gate 19 (19er)", content: "Besonderheiten beachten<br>• Spezielle Boarding-Prozeduren<br>• Enge Flughafen-Koordination<br>• Timing ist kritisch", emoji: "🚪", color: "from-purple-400 to-purple-600" },
+            { title: "11. Verhalten & Umgangsformen", content: "• Professionell mit Gästen<br>• Respektvolle Kommunikation<br>• Konflikte ruhig angehen<br>• Teamfähigkeit zeigen", emoji: "👥", color: "from-red-400 to-red-600" },
+            { title: "12. Hubwagen (Tow Tractors)", content: "• Nur geschultes Personal<br>• Sichere Bedienung<br>• Sicherheitsabstände einhalten<br>• Regelmäßige Wartung", emoji: "🚛", color: "from-yellow-400 to-yellow-600" },
+            { title: "13. Neue Anmeldungs-Anweisungen", content: "Korrekte Passagier-Anmeldung essentiell<br>• Alle Daten vollständig<br>• Double-Check durchführen<br>• Fehler sofort korrigieren", emoji: "📝", color: "from-indigo-400 to-indigo-600" },
+            { title: "14. Hintergrund der Regelungen", content: "Warum diese Änderungen?<br>🔒 Höhere Sicherheitsstandards<br>✈️ Internationale Compliance<br>👥 Besseres Passagiererlebnis", emoji: "💡", color: "from-gray-400 to-gray-600" },
+            
+            // Abschluss
+            { title: "Zusammenfassung", content: "✅ Aftech System verstanden<br>✅ WCHR Änderungen bekannt<br>✅ Team-Aufgaben klar<br>✅ Wichtige Regeln verinnerlicht", emoji: "📚", color: "from-blue-400 to-purple-600" },
+            { title: "Vielen Dank!", content: "Sie sind nun für 2026 geschult<br><br>Bei Fragen: Teamleitung kontaktieren<br>DRK Flughafen Köln", emoji: "✅", color: "from-green-400 to-green-600" }
+        ];
+
+        function startPresentation() {
+            currentSlideIndex = 0;
+            isPaused = false;
+            showSlide(0);
+            presentationInterval = setInterval(() => {
+                if (!isPaused) {
+                    nextSlide();
+                }
+            }, 5000); // 5 Sekunden pro Folie
+        }
+
+        function showSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            
+            const slide = slides[index];
+            const slideContent = document.getElementById('slideContent');
+            const progressBar = document.getElementById('progressBar');
+            const slideCounter = document.getElementById('slideCounter');
+            const timeRemaining = document.getElementById('timeRemaining');
+            
+            // Update content
+            slideContent.innerHTML = `
+                <div class="slide-animation">
+                    <div class="text-8xl mb-8 animate-bounce">${slide.emoji}</div>
+                    <h3 class="text-5xl font-bold text-gray-800 mb-6">${slide.title}</h3>
+                    <p class="text-2xl text-gray-700 leading-relaxed">${slide.content}</p>
+                </div>
+            `;
+            
+            // Update progress
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBar.style.width = progress + '%';
+            
+            // Update counter
+            slideCounter.textContent = `Folie ${index + 1} von ${slides.length}`;
+            
+            // Update time
+            const remainingSeconds = (slides.length - index - 1) * 5;
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            if (minutes > 0) {
+                timeRemaining.textContent = `⏱️ ca. ${minutes}:${seconds.toString().padStart(2, '0')} Minuten verbleibend`;
+            } else {
+                timeRemaining.textContent = `⏱️ ca. ${seconds} Sekunden verbleibend`;
+            }
+            
+            currentSlideIndex = index;
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < slides.length - 1) {
+                showSlide(currentSlideIndex + 1);
+            } else {
+                // Auto-Eko beendet
+                clearInterval(presentationInterval);
+                setTimeout(() => {
+                    if (confirm('Auto-Eko beendet! Zum Dashboard zurückkehren?')) {
+                        showDashboard();
+                    }
+                }, 1000);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlideIndex > 0) {
+                showSlide(currentSlideIndex - 1);
+            }
+        }
+
+        function pausePresentation() {
+            isPaused = true;
+        }
+
+        function resumePresentation() {
+            isPaused = false;
+        }
+
+        // Initialize checklists on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            createChecklist('stadttTeamChecklist', stadttTeamItems);
+            createChecklist('vorfeldTeamChecklist', vorfeldTeamItems);
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

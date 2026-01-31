@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player - Refresher 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-black min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-4xl w-full">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+                <h1 class="text-3xl font-bold text-white mb-2">📹 Schulungs-Video</h1>
+                <p class="text-blue-100">Refresher 2026 - DRK Flughafen Köln</p>
+            </div>
+            
+            <div class="p-8">
+                <div id="videoContainer" class="bg-gray-900 rounded-lg overflow-hidden mb-6 text-white text-center py-16">
+                    <p class="text-lg mb-4">⏳ Video wird geladen...</p>
+                    <div class="inline-block">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded mb-6">
+                    <h3 class="font-bold text-blue-900 mb-3">📚 Inhaltsübersicht</h3>
+                    <ul class="text-blue-800 space-y-2 text-sm">
+                        <li><strong>00:00-00:10</strong> - Intro</li>
+                        <li><strong>00:10-00:45</strong> - Auftragsübersicht & Tasks</li>
+                        <li><strong>00:45-02:00</strong> - Arbeitsablauf (Scannen, Beenden, Transfer)</li>
+                        <li><strong>02:00-02:30</strong> - Wichtige Hinweise & Fehler</li>
+                        <li><strong>02:30-02:50</strong> - Kommunikation & Zusätzliches</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-6">
+                    <h3 class="font-bold text-green-900 mb-3">✨ Tipps zum Video</h3>
+                    <ul class="text-green-800 space-y-2 text-sm">
+                        <li>✓ Nutze die Pause-Taste zum Anschauen von Details</li>
+                        <li>✓ Passe die Geschwindigkeit mit dem Video-Player an (0.75x, 1x, 1.5x, 2x)</li>
+                        <li>✓ Vollbild-Modus für besseres Seherlebnis (F-Taste)</li>
+                        <li>✓ Video mehrmals anschauen für optimales Lernen</li>
+                    </ul>
+                </div>
+
+                <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded mb-6">
+                    <h3 class="font-bold text-orange-900 mb-3">💡 Falls Video nicht lädt:</h3>
+                    <p class="text-orange-800 text-sm mb-3">Der Video-File kann auch manuell geöffnet werden:</p>
+                    <p class="text-orange-700 font-mono text-xs bg-white p-2 rounded break-all mb-3">refresher_2026_training.mp4</p>
+                    <button onclick="downloadVideo()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded transition">
+                        📥 Video herunterladen
+                    </button>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <a href="index.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition">
+                        ← Zurück zur Schulung
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Versuche Video zu laden
+        function loadVideo() {
+            const videoContainer = document.getElementById('videoContainer');
+            const videoPath = 'refresher_2026_training.mp4';
+            
+            // Erstelle video element
+            const video = document.createElement('video');
+            video.controls = true;
+            video.style.width = '100%';
+            video.style.maxHeight = '600px';
+            video.style.backgroundColor = '#000';
+            
+            const source = document.createElement('source');
+            source.src = videoPath;
+            source.type = 'video/mp4';
+            
+            video.appendChild(source);
+            
+            // Fallback text
+            video.textContent = 'Ihr Browser unterstützt HTML5 Video nicht.';
+            
+            // Event Listener
+            video.onerror = function() {
+                console.error('Video konnte nicht geladen werden:', videoPath);
+                showError();
+            };
+            
+            video.onloadedmetadata = function() {
+                console.log('Video erfolgreich geladen!');
+            };
+            
+            videoContainer.innerHTML = '';
+            videoContainer.appendChild(video);
+            
+            // Versuche auch mit autoplay fallback
+            setTimeout(() => {
+                if (video.readyState === 0) {
+                    console.warn('Video lädt nicht...');
+                }
+            }, 3000);
+        }
+        
+        function showError() {
+            const videoContainer = document.getElementById('videoContainer');
+            videoContainer.innerHTML = `
+                <div class="text-left">
+                    <p class="text-red-400 font-bold mb-4">❌ Video konnte nicht direkt geladen werden</p>
+                    <p class="text-gray-300 mb-4">Dies ist ein Browser-Sicherheitsproblem mit lokalen Dateien.</p>
+                    <p class="text-gray-400 text-sm mb-4">
+                        <strong>Lösungen:</strong><br>
+                        1. Verwende Firefox (meist weniger restriktiv)<br>
+                        2. Starte einen lokalen HTTP-Server<br>
+                        3. Lade das Video herunter und spiele es mit VLC/Windows Media Player ab
+                    </p>
+                    <button onclick="downloadVideo()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        📥 Video herunterladen
+                    </button>
+                </div>
+            `;
+        }
+        
+        function downloadVideo() {
+            const videoPath = 'refresher_2026_training.mp4';
+            const link = document.createElement('a');
+            link.href = videoPath;
+            link.download = 'Refresher_2026_Training.mp4';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Starte Video-Loading
+        window.addEventListener('load', () => {
+            console.log('Versuche Video zu laden...');
+            loadVideo();
+        });
+    </script>
+</body>
+</html>

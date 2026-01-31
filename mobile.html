@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aftech System - Mobile App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+        
+        .modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <!-- Mobile Phone Frame -->
+        <div class="w-full max-w-sm bg-gray-900 rounded-3xl shadow-2xl border-8 border-gray-800 overflow-hidden" style="min-height: 700px; max-height: 90vh;">
+            <!-- Status Bar -->
+            <div class="bg-black h-7 flex items-center justify-between px-6 text-white text-xs z-10">
+                <span>9:41</span>
+                <div class="flex gap-1">
+                    <span>📶</span>
+                    <span>📡</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+            
+            <!-- Screen Content -->
+            <div class="bg-white h-full overflow-hidden flex flex-col relative">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 text-center sticky top-0 z-10">
+                    <h1 class="font-bold text-lg">Aftech System</h1>
+                    <p class="text-xs opacity-90">Schritt <span id="stepCounter">1</span>/20</p>
+                </div>
+
+                <!-- Main Content Area -->
+                <div id="mobileContent" class="flex-1 overflow-y-auto p-4">
+                    <!-- Content wird hier eingefügt -->
+                </div>
+                
+                <!-- Bottom Navigation -->
+                <div class="bg-white border-t border-gray-200 p-3 sticky bottom-0 z-10">
+                    <div class="flex justify-between items-center gap-2">
+                        <button onclick="previousStep()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded text-xs font-semibold transition">
+                            ← Zurück
+                        </button>
+                        <span class="text-xs text-gray-600 font-semibold px-2" id="stepDisplay">1/20</span>
+                        <button onclick="nextStep()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-xs font-semibold transition">
+                            Weiter →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Home Button -->
+            <div class="bg-gray-900 h-6 flex items-center justify-center">
+                <div class="w-24 h-1 bg-gray-700 rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- Image Modal (Lightbox) -->
+        <div id="imageModal" class="modal" onclick="if(event.target.id === 'imageModal') closeModal()">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal()">✕</span>
+                <img id="modalImage" src="" alt="Vergrößertes Bild" onclick="event.stopPropagation()">
+            </div>
+        </div>
+
+        <!-- Desktop Link -->
+        <div class="fixed top-4 right-4">
+            <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition inline-flex items-center gap-2">
+                ← Zurück
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Alle 20 Aftech Schritte
+        const aftechSteps = [
+            {
+                title: "Schritt 1: Disregarden",
+                description: "Ignorieren von Aufträgen",
+                image: "Disregarden.jpg",
+                content: "Wenn Sie einen Auftrag ignorieren möchten, verwenden Sie diese Funktion."
+            },
+            {
+                title: "Schritt 2: Inbound",
+                description: "Ankommende Flüge",
+                image: "Inbound.jpg",
+                content: "Ankommende Flüge werden hier angezeigt und verwaltet."
+            },
+            {
+                title: "Schritt 3: Outbound",
+                description: "Abfliegende Flüge",
+                image: "Outbounds.jpg",
+                content: "Hier sehen Sie alle abfliegenden Flüge."
+            },
+            {
+                title: "Schritt 4: Tasks",
+                description: "Aufgaben-Übersicht",
+                image: "Tasks.jpg",
+                content: "Ihre aktuellen Aufgaben werden hier aufgelistet."
+            },
+            {
+                title: "Schritt 5: Tasks Handy",
+                description: "Mobile Ansicht der Aufgaben",
+                image: "Tasks Handy Korrektur.jpg",
+                content: "Die Tasks sind auch auf dem Handy verfügbar."
+            },
+            {
+                title: "Schritt 6: Bordkarte Scannen",
+                description: "Bordkarte einscannen",
+                image: "Bordkarte Scannen.jpg",
+                content: "Scannen Sie die Bordkarte des Passagiers."
+            },
+            {
+                title: "Schritt 7: Aussehen am Abholort",
+                description: "Korrekte Darstellung",
+                image: "Aussehen am Abholort.jpg",
+                content: "So sieht die Anzeige am Abholort aus."
+            },
+            {
+                title: "Schritt 8: Aussehen NICHT am Abholort",
+                description: "Andere Ansicht",
+                image: "Aussehen NICHT am Abholort.jpg",
+                content: "Wenn Sie nicht am Abholort sind, sieht es anders aus."
+            },
+            {
+                title: "Schritt 9: Transit-Beispiel",
+                description: "Transit-Passagiere",
+                image: "Beispiel Transit.jpg",
+                content: "Beispiel für die Abwicklung von Transit-Passagieren."
+            },
+            {
+                title: "Schritt 10: Auftragsübersicht",
+                description: "Alle Aufträge",
+                image: "Auftragsübersicht.jpg",
+                content: "Übersicht über alle Ihre Aufträge."
+            },
+            {
+                title: "Schritt 11: Spalte Employees",
+                description: "Mitarbeiter-Spalte",
+                image: "Spalte Emloyees.jpg",
+                content: "Die Mitarbeiter-Spalte zeigt zugewiesene Kollegen."
+            },
+            {
+                title: "Schritt 12: Transferieren - Schritt 1",
+                description: "Auftrag übertragen",
+                image: "Transferieren erster Schritt.jpg",
+                content: "Erster Schritt: Wählen Sie den Auftrag zum Übertragen aus."
+            },
+            {
+                title: "Schritt 13: Transferieren - Schritt 2",
+                description: "Empfänger wählen",
+                image: "Transferieren zweiter Schritt.jpg",
+                content: "Zweiter Schritt: Wählen Sie den Empfänger-Kollegen."
+            },
+            {
+                title: "Schritt 14: Transferieren - Final",
+                description: "Übertragung bestätigen",
+                image: "Transferieren finaler Schritt.jpg",
+                content: "Finaler Schritt: Bestätigen Sie die Übertragung."
+            },
+            {
+                title: "Schritt 15: Transferieren an andere",
+                description: "An Kollegen übertragen",
+                image: "Transferieren an andere Kollegen.jpg",
+                content: "Übertragen Sie Aufträge an andere Kollegen."
+            },
+            {
+                title: "Schritt 16: Richtiges Beenden Inbound",
+                description: "Inbound-Auftrag beenden",
+                image: "Richtiges Beenden Inbound.jpg",
+                content: "So beenden Sie einen Inbound-Auftrag korrekt."
+            },
+            {
+                title: "Schritt 17: Richtiges Beenden Outbound",
+                description: "Outbound-Auftrag beenden",
+                image: "Richtiges Beenden Outbound.jpg",
+                content: "So beenden Sie einen Outbound-Auftrag korrekt."
+            },
+            {
+                title: "Schritt 18: No Flight Inbound",
+                description: "Kein Flug (Ankunft)",
+                image: "No Flight Inbound.jpg",
+                content: "Was tun, wenn kein Inbound-Flug vorhanden ist."
+            },
+            {
+                title: "Schritt 19: No Flight Outbound",
+                description: "Kein Flug (Abflug)",
+                image: "No Flight Outbound.jpg",
+                content: "Was tun, wenn kein Outbound-Flug vorhanden ist."
+            },
+            {
+                title: "Schritt 20: Notes",
+                description: "Notizen erfassen",
+                image: "Notes.jpg",
+                content: "Erfassen Sie wichtige Notizen zu Aufträgen."
+            }
+        ];
+
+        let currentStep = 0;
+
+        function showStep(stepIndex) {
+            if (stepIndex < 0) stepIndex = 0;
+            if (stepIndex >= aftechSteps.length) stepIndex = aftechSteps.length - 1;
+            
+            currentStep = stepIndex;
+            const step = aftechSteps[stepIndex];
+            const mobileContent = document.getElementById('mobileContent');
+            
+            // Update counter
+            document.getElementById('stepCounter').textContent = (stepIndex + 1);
+            document.getElementById('stepDisplay').textContent = `${stepIndex + 1}/${aftechSteps.length}`;
+            
+            // Build content
+            let html = `
+                <div class="space-y-4">
+                    <h2 class="font-bold text-lg text-gray-800">${step.title}</h2>
+                    <p class="text-xs text-gray-600 italic">${step.description}</p>
+            `;
+            
+            // Add image if exists
+            if (step.image) {
+                html += `
+                    <div class="bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition" onclick="openModal('${step.image}')">
+                        <img src="${step.image}" alt="${step.title}" class="w-full h-48 object-cover bg-gray-200" 
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23e0e0e0%22 width=%22100%22 height=%22100%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-family=%22Arial%22 font-size=%2214%22>Bild nicht verfügbar</text></svg>'">
+                        <div class="text-center text-xs text-gray-500 py-2 bg-gray-100">
+                            🔍 Klicken zum Vergrößern
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add description
+            html += `
+                    <div class="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-500">
+                        <p class="text-xs text-blue-800 leading-relaxed">
+                            ${step.content}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            mobileContent.innerHTML = html;
+        }
+
+        function nextStep() {
+            showStep(currentStep + 1);
+            document.getElementById('mobileContent').scrollTop = 0;
+        }
+
+        function previousStep() {
+            showStep(currentStep - 1);
+            document.getElementById('mobileContent').scrollTop = 0;
+        }
+
+        function openModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextStep();
+            if (e.key === 'ArrowLeft') previousStep();
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            showStep(0);
+        });
+    </script>
+</body>
+</html>

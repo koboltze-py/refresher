@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aftech App Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .app-screen {
+            background: white;
+            min-height: 100vh;
+        }
+
+        .status-bar {
+            background: linear-gradient(to bottom, #1e3a8a, #1e40af);
+            color: white;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            font-size: 11px;
+        }
+
+        .nav-bar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+        }
+
+        .task-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-inbound {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-outbound {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-wchr {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .screen-fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flight-info {
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .button-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .button-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+
+        .screenshot-view {
+            position: relative;
+        }
+
+        .screenshot-view img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <span>9:41</span>
+        <div class="flex gap-2">
+            <span>📶</span>
+            <span>📡</span>
+            <span>🔋</span>
+        </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="appScreen" class="app-screen pb-20">
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <div class="flex items-center justify-between mb-2">
+                <h1 class="text-xl font-bold">Aftech System</h1>
+                <button onclick="window.location.href='index.html'" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded text-sm">
+                    Zurück
+                </button>
+            </div>
+            <div id="screenTitle" class="text-sm opacity-90">Übersicht</div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="contentArea" class="p-4">
+            <!-- Dashboard Screen (Default) -->
+            <div id="dashboardScreen" class="screen-fade-in">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="showScreen('inbound')">
+                        <div class="text-3xl mb-2">📥</div>
+                        <div class="font-semibold">Inbound</div>
+                        <div class="text-xs opacity-80 mt-1">Ankunft</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-amber-500 to-orange-600 text-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="showScreen('outbound')">
+                        <div class="text-3xl mb-2">📤</div>
+                        <div class="font-semibold">Outbound</div>
+                        <div class="text-xs opacity-80 mt-1">Abflug</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-4 shadow mb-4">
+                    <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <span>📋</span> Meine Tasks
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="task-card" onclick="showScreen('taskDetail')">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="font-semibold text-gray-800">Müller, Hans</div>
+                                    <div class="text-xs text-gray-600">LH 2345 → Gate B24</div>
+                                </div>
+                                <span class="badge badge-wchr">WCHR</span>
+                            </div>
+                            <div class="text-xs text-gray-600">Abflug: 14:30</div>
+                        </div>
+                        <div class="task-card" onclick="showScreen('taskDetail')">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="font-semibold text-gray-800">Schmidt, Anna</div>
+                                    <div class="text-xs text-gray-600">BA 901 → Terminal 1</div>
+                                </div>
+                                <span class="badge badge-inbound">Inbound</span>
+                            </div>
+                            <div class="text-xs text-gray-600">Ankunft: 15:45</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl p-4 shadow cursor-pointer" onclick="showScreenshot('Tasks.jpg')">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📱</span>
+                        <div>
+                            <div class="font-semibold">Tasks anzeigen</div>
+                            <div class="text-xs opacity-80">Alle Aufträge im Überblick</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inbound Screen -->
+            <div id="inboundScreen" class="screen-fade-in" style="display: none;">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-4">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xl">📥</span>
+                        <span class="font-semibold text-blue-900">Inbound Flüge</span>
+                    </div>
+                    <p class="text-sm text-blue-800">Ankommende Passagiere</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="task-card" onclick="showInboundDetail()">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800 mb-1">LH 1234</div>
+                                <div class="text-sm text-gray-600">Frankfurt → Köln</div>
+                                <div class="text-xs text-gray-500 mt-1">Ankunft: 14:15</div>
+                            </div>
+                            <div class="flex flex-col gap-1 items-end">
+                                <span class="badge badge-inbound">3 PAX</span>
+                                <span class="text-xs text-green-600 font-semibold">● Aktiv</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-card" onclick="showScreenshot('Inbound.jpg')">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800 mb-1">BA 901</div>
+                                <div class="text-sm text-gray-600">London → Köln</div>
+                                <div class="text-xs text-gray-500 mt-1">Ankunft: 15:45</div>
+                            </div>
+                            <div class="flex flex-col gap-1 items-end">
+                                <span class="badge badge-inbound">1 PAX</span>
+                                <span class="text-xs text-gray-600 font-semibold">● Wartend</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showScreenshot('Inbound.jpg')" class="action-button button-primary mt-6">
+                    Screenshot: Inbound Übersicht anzeigen
+                </button>
+            </div>
+
+            <!-- Outbound Screen -->
+            <div id="outboundScreen" class="screen-fade-in" style="display: none;">
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded mb-4">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xl">📤</span>
+                        <span class="font-semibold text-amber-900">Outbound Flüge</span>
+                    </div>
+                    <p class="text-sm text-amber-800">Abfliegende Passagiere</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="task-card" onclick="showScreenshot('Outbounds.jpg')">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800 mb-1">LH 2345</div>
+                                <div class="text-sm text-gray-600">Köln → München</div>
+                                <div class="text-xs text-gray-500 mt-1">Abflug: 16:30</div>
+                            </div>
+                            <div class="flex flex-col gap-1 items-end">
+                                <span class="badge badge-outbound">2 PAX</span>
+                                <span class="text-xs text-green-600 font-semibold">● Bereit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-card" onclick="showScreenshot('Outbounds.jpg')">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800 mb-1">EW 5678</div>
+                                <div class="text-sm text-gray-600">Köln → Düsseldorf</div>
+                                <div class="text-xs text-gray-500 mt-1">Abflug: 17:15</div>
+                            </div>
+                            <div class="flex flex-col gap-1 items-end">
+                                <span class="badge badge-outbound">1 PAX</span>
+                                <span class="text-xs text-blue-600 font-semibold">● Check-in</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showScreenshot('Outbounds.jpg')" class="action-button button-primary mt-6">
+                    Screenshot: Outbound Übersicht anzeigen
+                </button>
+            </div>
+
+            <!-- Task Detail Screen -->
+            <div id="taskDetailScreen" class="screen-fade-in" style="display: none;">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-4">
+                    <div class="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-4">
+                        <div class="text-lg font-bold">Müller, Hans</div>
+                        <div class="text-sm opacity-90">Passagier-Details</div>
+                    </div>
+                    
+                    <div class="p-4 space-y-4">
+                        <div class="flight-info">
+                            <div class="text-xs text-gray-600 mb-1">Flug</div>
+                            <div class="font-semibold text-gray-800">LH 2345</div>
+                            <div class="text-sm text-gray-600">Köln → München</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <div class="text-xs text-gray-600 mb-1">Service</div>
+                                <span class="badge badge-wchr">WCHR</span>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-600 mb-1">Gate</div>
+                                <div class="font-semibold text-gray-800">B24</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-600 mb-1">Abflug</div>
+                                <div class="font-semibold text-gray-800">14:30</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-600 mb-1">Status</div>
+                                <span class="text-green-600 font-semibold text-sm">● Aktiv</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-xs text-gray-600 mb-2">Notizen</div>
+                            <div class="bg-yellow-50 border border-yellow-200 p-3 rounded text-sm">
+                                Passagier benötigt Rollstuhl bis zum Gate. Keine Treppen möglich.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="showScreenshot('Bordkarte Scannen.jpg')" class="action-button button-primary">
+                        🎫 Bordkarte scannen
+                    </button>
+                    <button onclick="showTransfer()" class="action-button button-secondary">
+                        🔄 An Kollegen transferieren
+                    </button>
+                    <button onclick="showScreenshot('Notes.jpg')" class="action-button button-secondary">
+                        📝 Notiz hinzufügen
+                    </button>
+                    <button onclick="showComplete()" class="action-button button-primary">
+                        ✓ Auftrag abschließen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inbound Detail Screen -->
+            <div id="inboundDetailScreen" class="screen-fade-in" style="display: none;">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-4">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
+                        <div class="text-lg font-bold">LH 1234</div>
+                        <div class="text-sm opacity-90">Frankfurt → Köln</div>
+                    </div>
+                    
+                    <div class="p-4 space-y-4">
+                        <div class="flight-info">
+                            <div class="text-xs text-gray-600 mb-1">Ankunft</div>
+                            <div class="font-semibold text-gray-800">14:15</div>
+                            <div class="text-sm text-gray-600">Terminal 1, Gate A12</div>
+                        </div>
+
+                        <div>
+                            <div class="text-xs text-gray-600 mb-2">Passagiere (3)</div>
+                            <div class="space-y-2">
+                                <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <div class="font-semibold text-sm">Schmidt, Anna</div>
+                                            <div class="text-xs text-gray-600">WCHR - Abholort: Gepäckausgabe</div>
+                                        </div>
+                                        <span class="badge badge-wchr text-xs">WCHR</span>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <div class="font-semibold text-sm">Weber, Klaus</div>
+                                            <div class="text-xs text-gray-600">WCHC - Abholort: Flugzeug</div>
+                                        </div>
+                                        <span class="badge badge-wchr text-xs">WCHC</span>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <div class="font-semibold text-sm">Fischer, Maria</div>
+                                            <div class="text-xs text-gray-600">Transit → LH 5678</div>
+                                        </div>
+                                        <span class="badge badge-inbound text-xs">Transit</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="showScreenshot('Aussehen am Abholort.jpg')" class="action-button button-primary">
+                        📍 Am Abholort angekommen
+                    </button>
+                    <button onclick="showScreenshot('Aussehen NICHT am Abholort.jpg')" class="action-button button-secondary">
+                        ℹ️ Noch nicht am Abholort
+                    </button>
+                    <button onclick="showScreenshot('Beispiel Transit.jpg')" class="action-button button-secondary">
+                        🔄 Transit-Passagier Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Transfer Screen -->
+            <div id="transferScreen" class="screen-fade-in" style="display: none;">
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded mb-4">
+                    <div class="font-semibold text-purple-900 mb-1">Auftrag transferieren</div>
+                    <p class="text-sm text-purple-800">Wählen Sie einen Kollegen aus</p>
+                </div>
+
+                <div class="space-y-2 mb-6">
+                    <div class="bg-white border-2 border-gray-200 p-4 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                MS
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800">Max Schneider</div>
+                                <div class="text-xs text-gray-600">Verfügbar - 2 aktive Tasks</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white border-2 border-gray-200 p-4 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                                LM
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800">Lisa Müller</div>
+                                <div class="text-xs text-gray-600">Verfügbar - 1 aktiver Task</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="showScreenshot('Transferieren erster Schritt.jpg')" class="action-button button-secondary">
+                        📸 Schritt 1: Auftrag auswählen
+                    </button>
+                    <button onclick="showScreenshot('Transferieren zweiter Schritt.jpg')" class="action-button button-secondary">
+                        📸 Schritt 2: Empfänger wählen
+                    </button>
+                    <button onclick="showScreenshot('Transferieren finaler Schritt.jpg')" class="action-button button-primary">
+                        📸 Schritt 3: Bestätigen
+                    </button>
+                    <button onclick="showScreenshot('Transferieren an andere Kollegen.jpg')" class="action-button button-secondary">
+                        📸 Übersicht: An Kollegen transferieren
+                    </button>
+                </div>
+            </div>
+
+            <!-- Complete Screen -->
+            <div id="completeScreen" class="screen-fade-in" style="display: none;">
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">
+                    <div class="font-semibold text-green-900 mb-1">Auftrag abschließen</div>
+                    <p class="text-sm text-green-800">Wählen Sie die Art des Abschlusses</p>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div class="bg-white border-2 border-gray-200 p-4 rounded-xl">
+                        <div class="font-semibold text-gray-800 mb-2">Müller, Hans</div>
+                        <div class="text-sm text-gray-600">LH 2345 → Gate B24</div>
+                        <div class="text-xs text-gray-500 mt-1">WCHR Service</div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="showScreenshot('Richtiges Beenden Outbound.jpg')" class="action-button button-primary">
+                        ✓ Erfolgreich abgeschlossen (Outbound)
+                    </button>
+                    <button onclick="showScreenshot('Richtiges Beenden Inbound.jpg')" class="action-button button-primary">
+                        ✓ Erfolgreich abgeschlossen (Inbound)
+                    </button>
+                    <button onclick="showScreenshot('No Flight Outbound.jpg')" class="action-button button-secondary">
+                        ✕ Kein Flug (Outbound)
+                    </button>
+                    <button onclick="showScreenshot('No Flight Inbound.jpg')" class="action-button button-secondary">
+                        ✕ Kein Flug (Inbound)
+                    </button>
+                    <button onclick="showScreenshot('Disregarden.jpg')" class="action-button button-danger">
+                        🚫 Disregarden (Ignorieren)
+                    </button>
+                </div>
+
+                <div class="mt-6 bg-yellow-50 border border-yellow-200 p-4 rounded">
+                    <div class="text-sm font-semibold text-yellow-900 mb-1">⚠️ Wichtig</div>
+                    <div class="text-xs text-yellow-800">
+                        Wählen Sie die richtige Abschluss-Option. Bei "Kein Flug" dokumentieren Sie bitte den Grund.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showScreen('dashboard')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            <span class="text-xs">Home</span>
+        </div>
+        <div class="nav-item" onclick="showScreenshot('Tasks.jpg')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <span class="text-xs">Tasks</span>
+        </div>
+        <div class="nav-item" onclick="showScreenshot('Auftragsübersicht.jpg')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span class="text-xs">Übersicht</span>
+        </div>
+        <div class="nav-item" onclick="showScreenshot('Chatprogramm.jpg')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            <span class="text-xs">Chat</span>
+        </div>
+    </div>
+
+    <!-- Screenshot Modal -->
+    <div id="screenshotModal" class="modal-overlay">
+        <div class="modal-content screenshot-view">
+            <button class="close-btn" onclick="closeScreenshot()">✕</button>
+            <img id="screenshotImage" src="" alt="Screenshot">
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 'dashboard';
+
+        function showScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('[id$="Screen"]').forEach(screen => {
+                screen.style.display = 'none';
+            });
+
+            // Show selected screen
+            const screen = document.getElementById(screenName + 'Screen');
+            if (screen) {
+                screen.style.display = 'block';
+                screen.classList.add('screen-fade-in');
+                currentScreen = screenName;
+
+                // Update title
+                const titles = {
+                    'dashboard': 'Übersicht',
+                    'inbound': 'Inbound Flüge',
+                    'outbound': 'Outbound Flüge',
+                    'taskDetail': 'Task Details',
+                    'inboundDetail': 'Flug Details',
+                    'transfer': 'Transferieren',
+                    'complete': 'Abschließen'
+                };
+                document.getElementById('screenTitle').textContent = titles[screenName] || 'Aftech System';
+            }
+
+            // Update bottom nav active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            if (screenName === 'dashboard') {
+                document.querySelector('.nav-item').classList.add('active');
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function showInboundDetail() {
+            showScreen('inboundDetail');
+        }
+
+        function showTransfer() {
+            showScreen('transfer');
+        }
+
+        function showComplete() {
+            showScreen('complete');
+        }
+
+        function showScreenshot(imageName) {
+            const modal = document.getElementById('screenshotModal');
+            const image = document.getElementById('screenshotImage');
+            image.src = imageName;
+            modal.classList.add('active');
+        }
+
+        function closeScreenshot() {
+            const modal = document.getElementById('screenshotModal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal on overlay click
+        document.getElementById('screenshotModal').addEventListener('click', function(e) {
+            if (e.target.id === 'screenshotModal') {
+                closeScreenshot();
+            }
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeScreenshot();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aftech Training Game - DRK Airport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .level-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .level-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .level-card.completed {
+            border: 3px solid #22c55e;
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+
+        .quiz-option {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .quiz-option:hover:not(.correct):not(.wrong) {
+            background: #f3f4f6;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: #dcfce7;
+            border-color: #22c55e;
+        }
+
+        .quiz-option.wrong {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+
+        .scenario-card {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            animation: confetti 3s ease-out forwards;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .drag-item {
+            cursor: move;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .drag-item:hover {
+            transform: scale(1.02);
+        }
+
+        .drag-item.dragging {
+            opacity: 0.5;
+        }
+
+        .drop-zone {
+            min-height: 100px;
+            transition: all 0.2s;
+        }
+
+        .drop-zone.drag-over {
+            background: #dbeafe !important;
+            border-color: #3b82f6 !important;
+        }
+
+        .memory-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .memory-card.flipped .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card-front,
+        .memory-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+        }
+
+        .memory-card-back {
+            transform: rotateY(180deg);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 30px;
+            bottom: -30px;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-6 shadow-lg">
+        <div class="game-container px-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold mb-1">🎮 Aftech Training Game</h1>
+                    <p class="text-blue-100">Lerne spielend alle Inhalte der Schulung</p>
+                </div>
+                <button onclick="window.location.href='index.html'" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg font-semibold transition">
+                    ← Zurück
+                </button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="mt-6 bg-white bg-opacity-20 rounded-full h-4 overflow-hidden">
+                <div id="totalProgress" class="progress-bar bg-white h-full rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="mt-2 text-center text-sm">
+                <span id="progressText">0 von 0 Level abgeschlossen</span>
+                <span class="ml-4">⭐ <span id="starCount">0</span> Sterne</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="game-container px-4 py-8">
+        <!-- Level Selection Screen -->
+        <div id="levelSelection" class="slide-in">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Wähle ein Level</h2>
+                <p class="text-gray-600">Jedes Level vermittelt wichtige Schulungsinhalte</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Level 1: Aftech Basics -->
+                <div class="level-card bg-white rounded-xl shadow-lg p-6" onclick="startLevel(1)">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <span class="text-2xl">💻</span>
+                        </div>
+                        <div id="level1Stars" class="text-yellow-400 text-xl">☆☆☆</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Level 1: Aftech Basics</h3>
+                    <p class="text-gray-600 text-sm mb-4">Lerne die grundlegenden Funktionen des Aftech Systems kennen</p>
+                    <div class="flex gap-2">
+                        <span class="badge bg-blue-100 text-blue-800">📋 Quiz</span>
+                        <span class="badge bg-purple-100 text-purple-800">🎯 10 Fragen</span>
+                    </div>
+                </div>
+
+                <!-- Level 2: Workflow Master -->
+                <div class="level-card bg-white rounded-xl shadow-lg p-6" onclick="startLevel(2)">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <span class="text-2xl">🔄</span>
+                        </div>
+                        <div id="level2Stars" class="text-yellow-400 text-xl">☆☆☆</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Level 2: Workflow Master</h3>
+                    <p class="text-gray-600 text-sm mb-4">Bringe Arbeitsschritte in die richtige Reihenfolge</p>
+                    <div class="flex gap-2">
+                        <span class="badge bg-green-100 text-green-800">🎲 Sortieren</span>
+                        <span class="badge bg-purple-100 text-purple-800">📝 5 Workflows</span>
+                    </div>
+                </div>
+
+                <!-- Level 3: Szenario Training -->
+                <div class="level-card bg-white rounded-xl shadow-lg p-6" onclick="startLevel(3)">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-purple-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <span class="text-2xl">🎭</span>
+                        </div>
+                        <div id="level3Stars" class="text-yellow-400 text-xl">☆☆☆</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Level 3: Szenario Training</h3>
+                    <p class="text-gray-600 text-sm mb-4">Entscheide in realistischen Situationen richtig</p>
+                    <div class="flex gap-2">
+                        <span class="badge bg-purple-100 text-purple-800">🎬 Szenarien</span>
+                        <span class="badge bg-orange-100 text-orange-800">8 Situationen</span>
+                    </div>
+                </div>
+
+                <!-- Level 4: Team Challenge -->
+                <div class="level-card bg-white rounded-xl shadow-lg p-6" onclick="startLevel(4)">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-orange-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <span class="text-2xl">👥</span>
+                        </div>
+                        <div id="level4Stars" class="text-yellow-400 text-xl">☆☆☆</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Level 4: Team Challenge</h3>
+                    <p class="text-gray-600 text-sm mb-4">Ordne Aufgaben dem richtigen Team zu</p>
+                    <div class="flex gap-2">
+                        <span class="badge bg-orange-100 text-orange-800">🤝 Drag & Drop</span>
+                        <span class="badge bg-purple-100 text-purple-800">12 Aufgaben</span>
+                    </div>
+                </div>
+
+                <!-- Level 5: WCHR Expert -->
+                <div class="level-card bg-white rounded-xl shadow-lg p-6" onclick="startLevel(5)">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-pink-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <span class="text-2xl">♿</span>
+                        </div>
+                        <div id="level5Stars" class="text-yellow-400 text-xl">☆☆☆</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Level 5: WCHR Expert</h3>
+                    <p class="text-gray-600 text-sm mb-4">Meistere die neuen EU-Verordnungen</p>
+                    <div class="flex gap-2">
+                        <span class="badge bg-pink-100 text-pink-800">♿ WCHR</span>
+                        <span class="badge bg-purple-100 text-purple-800">Vorher/Nachher</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen (hidden initially) -->
+        <div id="gameScreen" class="hidden slide-in">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        const gameState = {
+            currentLevel: 0,
+            completedLevels: new Set(),
+            stars: 0,
+            levelStars: {}
+        };
+
+        // Load saved progress
+        function loadProgress() {
+            const saved = localStorage.getItem('aftechGameProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                gameState.completedLevels = new Set(data.completedLevels || []);
+                gameState.stars = data.stars || 0;
+                gameState.levelStars = data.levelStars || {};
+                updateProgress();
+            }
+        }
+
+        // Save progress
+        function saveProgress() {
+            localStorage.setItem('aftechGameProgress', JSON.stringify({
+                completedLevels: Array.from(gameState.completedLevels),
+                stars: gameState.stars,
+                levelStars: gameState.levelStars
+            }));
+            updateProgress();
+        }
+
+        // Update progress display
+        function updateProgress() {
+            const totalLevels = 5;
+            const completed = gameState.completedLevels.size;
+            const percentage = (completed / totalLevels) * 100;
+            
+            document.getElementById('totalProgress').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${completed} von ${totalLevels} Level abgeschlossen`;
+            document.getElementById('starCount').textContent = gameState.stars;
+
+            // Update level cards
+            for (let i = 1; i <= totalLevels; i++) {
+                const card = document.querySelector(`#level${i}Stars`);
+                const stars = gameState.levelStars[i] || 0;
+                if (card) {
+                    card.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+                }
+                
+                // Mark completed levels
+                const levelCard = card?.closest('.level-card');
+                if (levelCard && gameState.completedLevels.has(i)) {
+                    levelCard.classList.add('completed');
+                }
+            }
+        }
+
+        // Start a level
+        function startLevel(levelNum) {
+            gameState.currentLevel = levelNum;
+            document.getElementById('levelSelection').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            switch(levelNum) {
+                case 1: loadLevel1(); break;
+                case 2: loadLevel2(); break;
+                case 3: loadLevel3(); break;
+                case 4: loadLevel4(); break;
+                case 5: loadLevel5(); break;
+            }
+        }
+
+        // Return to level selection
+        function returnToLevels() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('levelSelection').classList.remove('hidden');
+            gameState.currentLevel = 0;
+        }
+
+        // Complete a level
+        function completeLevel(stars) {
+            const level = gameState.currentLevel;
+            
+            // Update stars (only if better)
+            const currentStars = gameState.levelStars[level] || 0;
+            if (stars > currentStars) {
+                const newStars = stars - currentStars;
+                gameState.stars += newStars;
+                gameState.levelStars[level] = stars;
+            }
+            
+            gameState.completedLevels.add(level);
+            saveProgress();
+            
+            // Show completion message
+            showCompletionScreen(stars);
+        }
+
+        // Show completion screen
+        function showCompletionScreen(stars) {
+            createConfetti();
+            
+            const gameScreen = document.getElementById('gameScreen');
+            gameScreen.innerHTML = `
+                <div class="text-center py-12 slide-in">
+                    <div class="bg-white rounded-2xl shadow-2xl p-12 max-w-2xl mx-auto">
+                        <div class="text-6xl mb-6">🎉</div>
+                        <h2 class="text-4xl font-bold text-gray-800 mb-4">Level Geschafft!</h2>
+                        <div class="text-5xl text-yellow-400 mb-6">
+                            ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}
+                        </div>
+                        <p class="text-xl text-gray-600 mb-8">Du hast ${stars} von 3 Sternen erreicht!</p>
+                        
+                        <div class="flex gap-4 justify-center">
+                            <button onclick="startLevel(${gameState.currentLevel})" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition shadow-lg">
+                                🔄 Nochmal spielen
+                            </button>
+                            <button onclick="returnToLevels()" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition shadow-lg">
+                                📋 Zurück zu Levels
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create confetti animation
+        function createConfetti() {
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // LEVEL 1: Aftech Basics Quiz
+        function loadLevel1() {
+            const questions = [
+                {
+                    q: "Was bedeutet 'Disregarden' im Aftech System?",
+                    options: ["Löschen", "Ignorieren/Ablehnen", "Speichern", "Übertragen"],
+                    correct: 1,
+                    explanation: "Disregarden bedeutet einen Auftrag zu ignorieren oder abzulehnen."
+                },
+                {
+                    q: "Wo scannt man die Bordkarte im System?",
+                    options: ["Im Hauptmenü", "In der Bordkarten-Scan-Funktion", "Bei Outbound", "In den Einstellungen"],
+                    correct: 1,
+                    explanation: "Es gibt eine spezielle Funktion zum Scannen von Bordkarten."
+                },
+                {
+                    q: "Was ist der Unterschied zwischen Inbound und Outbound?",
+                    options: ["Ankunft vs. Abflug", "Tag vs. Nacht", "Terminal 1 vs. 2", "National vs. International"],
+                    correct: 0,
+                    explanation: "Inbound = Ankunft, Outbound = Abflug"
+                },
+                {
+                    q: "Wie transferiert man einen Auftrag an Kollegen?",
+                    options: ["Per E-Mail", "3-Schritte-Prozess im System", "Telefonisch", "Gar nicht möglich"],
+                    correct: 1,
+                    explanation: "Transferieren erfolgt in 3 Schritten: Auftrag wählen → Empfänger wählen → Bestätigen"
+                },
+                {
+                    q: "Was tut man, wenn kein Flug gefunden wird?",
+                    options: ["Auftrag löschen", "No Flight markieren", "Ignorieren", "Warten"],
+                    correct: 1,
+                    explanation: "Es gibt spezielle 'No Flight' Optionen für Inbound und Outbound."
+                },
+                {
+                    q: "Wo findet man Notizen zu einem Auftrag?",
+                    options: ["Im Chat", "In der Notes-Funktion", "Per SMS", "In E-Mails"],
+                    correct: 1,
+                    explanation: "Die Notes-Funktion ermöglicht das Hinzufügen und Einsehen von Notizen."
+                },
+                {
+                    q: "Was zeigt die Spalte 'Employees'?",
+                    options: ["Mitarbeiterliste", "Zugewiesene Kollegen", "Schichtplan", "Urlaubsplan"],
+                    correct: 1,
+                    explanation: "Die Employees-Spalte zeigt, welche Kollegen einem Auftrag zugewiesen sind."
+                },
+                {
+                    q: "Wie beendet man einen Outbound-Auftrag richtig?",
+                    options: ["Einfach schließen", "Richtiges Beenden-Funktion nutzen", "Löschen", "Transferieren"],
+                    correct: 1,
+                    explanation: "Es gibt eine spezielle Funktion zum richtigen Beenden von Outbound-Aufträgen."
+                },
+                {
+                    q: "Was ist ein Transit-Passagier?",
+                    options: ["Gepäcklos", "Umsteiger", "VIP", "Rollstuhl"],
+                    correct: 1,
+                    explanation: "Transit-Passagiere steigen um und benötigen besondere Begleitung zwischen Flügen."
+                },
+                {
+                    q: "Wo sieht man die Auftragsübersicht?",
+                    options: ["Im Dashboard", "In der Auftragsübersicht-Funktion", "Per E-Mail", "Im Kalender"],
+                    correct: 1,
+                    explanation: "Die Auftragsübersicht zeigt alle aktuellen Aufträge zentral an."
+                }
+            ];
+
+            let currentQ = 0;
+            let score = 0;
+
+            function showQuestion() {
+                const q = questions[currentQ];
+                document.getElementById('gameScreen').innerHTML = `
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-lg p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <button onclick="returnToLevels()" class="text-gray-600 hover:text-gray-800 font-semibold">
+                                    ← Abbrechen
+                                </button>
+                                <div class="text-sm font-semibold text-gray-600">
+                                    Frage ${currentQ + 1} von ${questions.length}
+                                </div>
+                            </div>
+
+                            <div class="mb-8">
+                                <div class="bg-blue-50 rounded-lg h-2 mb-6">
+                                    <div class="bg-blue-600 h-2 rounded-lg transition-all" style="width: ${((currentQ) / questions.length) * 100}%"></div>
+                                </div>
+                                
+                                <h3 class="text-2xl font-bold text-gray-800 mb-6">${q.q}</h3>
+                                
+                                <div class="space-y-3" id="options">
+                                    ${q.options.map((opt, i) => `
+                                        <div class="quiz-option border-2 border-gray-200 rounded-lg p-4 text-left" onclick="selectAnswer(${i})">
+                                            <span class="font-semibold">${String.fromCharCode(65 + i)}.</span> ${opt}
+                                        </div>
+                                    `).join('')}
+                                </div>
+
+                                <div id="feedback" class="mt-6 hidden"></div>
+                            </div>
+
+                            <div class="text-center text-gray-600">
+                                Score: ${score} / ${currentQ}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            window.selectAnswer = function(index) {
+                const q = questions[currentQ];
+                const options = document.querySelectorAll('.quiz-option');
+                const feedback = document.getElementById('feedback');
+                
+                // Disable all options
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                
+                if (index === q.correct) {
+                    options[index].classList.add('correct');
+                    score++;
+                    feedback.className = 'mt-6 bg-green-100 border-l-4 border-green-500 p-4 rounded';
+                    feedback.innerHTML = `<p class="text-green-800 font-semibold">✓ Richtig!</p><p class="text-green-700 text-sm mt-1">${q.explanation}</p>`;
+                } else {
+                    options[index].classList.add('wrong');
+                    options[q.correct].classList.add('correct');
+                    feedback.className = 'mt-6 bg-red-100 border-l-4 border-red-500 p-4 rounded';
+                    feedback.innerHTML = `<p class="text-red-800 font-semibold">✗ Falsch</p><p class="text-red-700 text-sm mt-1">${q.explanation}</p>`;
+                }
+                
+                feedback.classList.remove('hidden');
+                
+                // Next button
+                setTimeout(() => {
+                    const btn = document.createElement('button');
+                    btn.className = 'mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition w-full';
+                    btn.textContent = currentQ < questions.length - 1 ? 'Nächste Frage →' : 'Ergebnis anzeigen';
+                    btn.onclick = () => {
+                        currentQ++;
+                        if (currentQ < questions.length) {
+                            showQuestion();
+                        } else {
+                            const percentage = (score / questions.length) * 100;
+                            const stars = percentage >= 90 ? 3 : percentage >= 70 ? 2 : percentage >= 50 ? 1 : 0;
+                            completeLevel(stars);
+                        }
+                    };
+                    feedback.appendChild(btn);
+                }, 500);
+            };
+
+            showQuestion();
+        }
+
+        // LEVEL 2: Workflow Master
+        function loadLevel2() {
+            const workflows = [
+                {
+                    title: "Inbound Passagier abholen",
+                    steps: [
+                        "Auftrag in Aftech öffnen",
+                        "Zum Abholort gehen",
+                        "'Am Abholort' markieren",
+                        "Passagier abholen",
+                        "Zum Ziel begleiten",
+                        "Auftrag korrekt beenden"
+                    ]
+                },
+                {
+                    title: "Outbound Passagier zum Gate bringen",
+                    steps: [
+                        "Bordkarte scannen",
+                        "Gate-Nummer prüfen",
+                        "Passagier abholen",
+                        "Zum Gate begleiten",
+                        "An Flugpersonal übergeben",
+                        "Auftrag abschließen"
+                    ]
+                },
+                {
+                    title: "Auftrag transferieren",
+                    steps: [
+                        "Auftrag auswählen",
+                        "Transfer-Funktion öffnen",
+                        "Kollegen auswählen",
+                        "Grund angeben (optional)",
+                        "Transfer bestätigen",
+                        "Bestätigung prüfen"
+                    ]
+                },
+                {
+                    title: "Transit-Passagier begleiten",
+                    steps: [
+                        "Inbound-Flug prüfen",
+                        "Passagier am Gate abholen",
+                        "Outbound-Gate herausfinden",
+                        "Zum Anschlussflug begleiten",
+                        "An Flugpersonal übergeben",
+                        "Beide Flüge dokumentieren"
+                    ]
+                },
+                {
+                    title: "No Flight Situation",
+                    steps: [
+                        "Flug im System suchen",
+                        "Keine Übereinstimmung finden",
+                        "'No Flight' Option wählen",
+                        "Grund dokumentieren",
+                        "Vorgesetzten informieren",
+                        "Auftrag entsprechend beenden"
+                    ]
+                }
+            ];
+
+            let currentWorkflow = 0;
+            let shuffledSteps = [];
+            let correctOrder = [];
+
+            function startWorkflow() {
+                if (currentWorkflow >= workflows.length) {
+                    completeLevel(3);
+                    return;
+                }
+
+                const workflow = workflows[currentWorkflow];
+                correctOrder = [...workflow.steps];
+                shuffledSteps = [...workflow.steps].sort(() => Math.random() - 0.5);
+
+                document.getElementById('gameScreen').innerHTML = `
+                    <div class="max-w-4xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-lg p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <button onclick="returnToLevels()" class="text-gray-600 hover:text-gray-800 font-semibold">
+                                    ← Abbrechen
+                                </button>
+                                <div class="text-sm font-semibold text-gray-600">
+                                    Workflow ${currentWorkflow + 1} von ${workflows.length}
+                                </div>
+                            </div>
+
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">${workflow.title}</h3>
+                            <p class="text-gray-600 mb-6">Bringe die Schritte in die richtige Reihenfolge (per Drag & Drop):</p>
+
+                            <div class="space-y-3" id="sortableList">
+                                ${shuffledSteps.map((step, i) => `
+                                    <div class="drag-item bg-gray-50 border-2 border-gray-300 rounded-lg p-4 cursor-move" draggable="true" data-index="${i}">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-gray-400">☰</span>
+                                            <span class="flex-1">${step}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <button onclick="checkWorkflowOrder()" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold w-full transition">
+                                ✓ Reihenfolge prüfen
+                            </button>
+
+                            <div id="workflowFeedback" class="mt-6"></div>
+                        </div>
+                    </div>
+                `;
+
+                setupDragAndDrop();
+            }
+
+            function setupDragAndDrop() {
+                const items = document.querySelectorAll('.drag-item');
+                let draggedItem = null;
+
+                items.forEach(item => {
+                    item.addEventListener('dragstart', function() {
+                        draggedItem = this;
+                        this.classList.add('dragging');
+                    });
+
+                    item.addEventListener('dragend', function() {
+                        this.classList.remove('dragging');
+                    });
+
+                    item.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        const list = document.getElementById('sortableList');
+                        const afterElement = getDragAfterElement(list, e.clientY);
+                        if (afterElement == null) {
+                            list.appendChild(draggedItem);
+                        } else {
+                            list.insertBefore(draggedItem, afterElement);
+                        }
+                    });
+                });
+            }
+
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.drag-item:not(.dragging)')];
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            window.checkWorkflowOrder = function() {
+                const items = document.querySelectorAll('.drag-item');
+                const currentOrder = Array.from(items).map(item => item.textContent.trim().replace('☰', '').trim());
+                
+                const isCorrect = currentOrder.every((step, i) => step === correctOrder[i]);
+                const feedback = document.getElementById('workflowFeedback');
+
+                if (isCorrect) {
+                    feedback.innerHTML = `
+                        <div class="bg-green-100 border-l-4 border-green-500 p-4 rounded">
+                            <p class="text-green-800 font-semibold text-lg">🎉 Perfekt!</p>
+                            <p class="text-green-700 mt-1">Die Reihenfolge ist korrekt!</p>
+                            <button onclick="nextWorkflow()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition w-full">
+                                ${currentWorkflow < workflows.length - 1 ? 'Nächster Workflow →' : 'Level abschließen'}
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    feedback.innerHTML = `
+                        <div class="bg-red-100 border-l-4 border-red-500 p-4 rounded">
+                            <p class="text-red-800 font-semibold">✗ Noch nicht richtig</p>
+                            <p class="text-red-700 text-sm mt-1">Versuche es nochmal. Überlege dir die logische Reihenfolge!</p>
+                        </div>
+                    `;
+                }
+            };
+
+            window.nextWorkflow = function() {
+                currentWorkflow++;
+                startWorkflow();
+            };
+
+            startWorkflow();
+        }
+
+        // LEVEL 3: Szenario Training
+        function loadLevel3() {
+            const scenarios = [
+                {
+                    title: "Verspäteter Inbound-Flug",
+                    description: "Der Flug LH1234 hat 45 Minuten Verspätung. Der Passagier hat einen Anschlussflug in 60 Minuten.",
+                    question: "Was solltest du tun?",
+                    options: [
+                        "Warten bis der Flug landet und dann normal abholen",
+                        "Vorgesetzten informieren und Anschlussflug prüfen",
+                        "Auftrag transferieren",
+                        "Nichts tun, ist nicht meine Verantwortung"
+                    ],
+                    correct: 1,
+                    explanation: "Bei knapper Zeit für Anschlussflüge muss der Vorgesetzte informiert werden, um Priorität zu setzen."
+                },
+                {
+                    title: "Passagier nicht am Abholort",
+                    description: "Du bist am vereinbarten Abholort, aber der Passagier ist nicht da.",
+                    question: "Wie gehst du vor?",
+                    options: [
+                        "Auftrag sofort beenden mit 'No Show'",
+                        "5 Minuten warten, dann per Chat/Notes nachfragen",
+                        "Zum nächsten Auftrag gehen",
+                        "Den ganzen Tag warten"
+                    ],
+                    correct: 1,
+                    explanation: "Kurz warten, dann Kommunikation über System aufnehmen. Nie einfach verschwinden!"
+                },
+                {
+                    title: "WCHR vs WCHC",
+                    description: "Ein Passagier mit WCHR-Service möchte einen Rollstuhl bis zum Gate.",
+                    question: "Was ist richtig?",
+                    options: [
+                        "WCHR = Rollstuhl nur für lange Strecken",
+                        "WCHR = Kann gehen, aber nicht weit",
+                        "WCHR = Muss immer getragen werden",
+                        "WCHR = Braucht gar keinen Rollstuhl"
+                    ],
+                    correct: 1,
+                    explanation: "WCHR bedeutet: Kann gehen, aber nicht lange Strecken. WCHC = kann nicht gehen (Cabin)"
+                },
+                {
+                    title: "Falsches Gate",
+                    description: "Du hast den Passagier zu Gate B12 gebracht, aber der Flug geht von B24.",
+                    question: "Was tust du?",
+                    options: [
+                        "Passagier alleine laufen lassen",
+                        "Zum richtigen Gate begleiten und Fehler dokumentieren",
+                        "Kollegen anrufen",
+                        "So tun als wäre nichts"
+                    ],
+                    correct: 1,
+                    explanation: "Fehler passieren - wichtig ist, sie zu korrigieren und zu dokumentieren!"
+                },
+                {
+                    title: "Transfer-Anfrage",
+                    description: "Ein Kollege bittet dich, einen Auftrag zu übernehmen. Du hast bereits 3 aktive Tasks.",
+                    question: "Wie reagierst du?",
+                    options: [
+                        "Sofort annehmen ohne zu prüfen",
+                        "Prüfen ob zeitlich machbar, dann annehmen oder ablehnen",
+                        "Ignorieren",
+                        "Immer ablehnen"
+                    ],
+                    correct: 1,
+                    explanation: "Teamwork ist wichtig, aber du musst realistisch einschätzen, was du schaffen kannst."
+                },
+                {
+                    title: "Bordkarte nicht scannbar",
+                    description: "Die Bordkarte des Passagiers lässt sich nicht scannen.",
+                    question: "Was machst du?",
+                    options: [
+                        "Passagier nach Hause schicken",
+                        "Daten manuell eingeben und weiter machen",
+                        "Auftrag abbrechen",
+                        "Andere Bordkarte suchen"
+                    ],
+                    correct: 1,
+                    explanation: "Wenn der Scanner nicht funktioniert, können Daten manuell eingegeben werden."
+                },
+                {
+                    title: "Leihrolli zurückbringen",
+                    description: "Du hast einen Leihrollstuhl benutzt. Dein nächster Auftrag ist dringend.",
+                    question: "Was tust du?",
+                    options: [
+                        "Leihrolli stehen lassen",
+                        "Leihrolli IMMER sofort zurückbringen - Priorität!",
+                        "Kollegen bitten es zu tun",
+                        "Später zurückbringen"
+                    ],
+                    correct: 1,
+                    explanation: "Leihrollis MÜSSEN sofort zurückgebracht werden - sie werden dringend gebraucht!"
+                },
+                {
+                    title: "Non-Schengen Transfer",
+                    description: "Ein Passagier muss von Schengen nach Non-Schengen wechseln.",
+                    question: "Was ist wichtig?",
+                    options: [
+                        "Nichts besonderes",
+                        "Passagier muss durch Passkontrolle",
+                        "Nur im Terminal bleiben",
+                        "Sofort zum Gate"
+                    ],
+                    correct: 1,
+                    explanation: "Bei Non-Schengen muss der Passagier zur Passkontrolle!"
+                }
+            ];
+
+            let currentScenario = 0;
+            let score = 0;
+
+            function showScenario() {
+                if (currentScenario >= scenarios.length) {
+                    const percentage = (score / scenarios.length) * 100;
+                    const stars = percentage >= 87.5 ? 3 : percentage >= 62.5 ? 2 : 1;
+                    completeLevel(stars);
+                    return;
+                }
+
+                const s = scenarios[currentScenario];
+                document.getElementById('gameScreen').innerHTML = `
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-lg p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <button onclick="returnToLevels()" class="text-gray-600 hover:text-gray-800 font-semibold">
+                                    ← Abbrechen
+                                </button>
+                                <div class="text-sm font-semibold text-gray-600">
+                                    Szenario ${currentScenario + 1} von ${scenarios.length}
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-50 border-l-4 border-purple-500 p-6 rounded-lg mb-6">
+                                <h3 class="text-xl font-bold text-purple-900 mb-2">${s.title}</h3>
+                                <p class="text-purple-800">${s.description}</p>
+                            </div>
+
+                            <h4 class="text-lg font-semibold text-gray-800 mb-4">${s.question}</h4>
+
+                            <div class="space-y-3" id="scenarioOptions">
+                                ${s.options.map((opt, i) => `
+                                    <div class="quiz-option border-2 border-gray-200 rounded-lg p-4" onclick="selectScenarioAnswer(${i})">
+                                        ${opt}
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div id="scenarioFeedback" class="mt-6 hidden"></div>
+
+                            <div class="mt-6 text-center text-gray-600">
+                                Score: ${score} / ${currentScenario}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            window.selectScenarioAnswer = function(index) {
+                const s = scenarios[currentScenario];
+                const options = document.querySelectorAll('.quiz-option');
+                const feedback = document.getElementById('scenarioFeedback');
+                
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                
+                if (index === s.correct) {
+                    options[index].classList.add('correct');
+                    score++;
+                    feedback.className = 'mt-6 bg-green-100 border-l-4 border-green-500 p-4 rounded';
+                    feedback.innerHTML = `
+                        <p class="text-green-800 font-semibold">✓ Richtig!</p>
+                        <p class="text-green-700 text-sm mt-1">${s.explanation}</p>
+                    `;
+                } else {
+                    options[index].classList.add('wrong');
+                    options[s.correct].classList.add('correct');
+                    feedback.className = 'mt-6 bg-red-100 border-l-4 border-red-500 p-4 rounded';
+                    feedback.innerHTML = `
+                        <p class="text-red-800 font-semibold">✗ Falsch</p>
+                        <p class="text-red-700 text-sm mt-1">${s.explanation}</p>
+                    `;
+                }
+                
+                feedback.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    const btn = document.createElement('button');
+                    btn.className = 'mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold w-full transition';
+                    btn.textContent = currentScenario < scenarios.length - 1 ? 'Nächstes Szenario →' : 'Ergebnis anzeigen';
+                    btn.onclick = () => {
+                        currentScenario++;
+                        showScenario();
+                    };
+                    feedback.appendChild(btn);
+                }, 500);
+            };
+
+            showScenario();
+        }
+
+        // LEVEL 4: Team Challenge (Drag & Drop)
+        function loadLevel4() {
+            const tasks = [
+                { text: "Passagiere zum/vom Flugzeug begleiten", team: "vorfeld" },
+                { text: "Check-in Counter betreuen", team: "stadt" },
+                { text: "Boarding Assistance am Gate", team: "vorfeld" },
+                { text: "Passagiere im Terminal abholen", team: "stadt" },
+                { text: "Gepäck-Service im Vorfeld", team: "vorfeld" },
+                { text: "Information & Orientierung Terminal", team: "stadt" },
+                { text: "Bus-Transfer zum Flugzeug", team: "vorfeld" },
+                { text: "Ankunft Gepäckausgabe abholen", team: "stadt" },
+                { text: "De-Boarding vom Flugzeug", team: "vorfeld" },
+                { text: "Transfer zwischen Terminals", team: "stadt" },
+                { text: "Apron Service (Vorfeld-Bereich)", team: "vorfeld" },
+                { text: "Fast Track Begleitung Terminal", team: "stadt" }
+            ];
+
+            let shuffled = [...tasks].sort(() => Math.random() - 0.5);
+            let stadtTeam = [];
+            let vorfeldTeam = [];
+
+            function render() {
+                const poolTasks = shuffled.filter(t => !stadtTeam.includes(t) && !vorfeldTeam.includes(t));
+
+                document.getElementById('gameScreen').innerHTML = `
+                    <div class="max-w-6xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-lg p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <button onclick="returnToLevels()" class="text-gray-600 hover:text-gray-800 font-semibold">
+                                    ← Abbrechen
+                                </button>
+                                <h2 class="text-2xl font-bold text-gray-800">Team Challenge</h2>
+                            </div>
+
+                            <p class="text-gray-600 mb-6">Ziehe die Aufgaben per Drag & Drop in das richtige Team:</p>
+
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <!-- Pool -->
+                                <div class="bg-gray-50 rounded-xl p-4">
+                                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                        <span>📋</span> Aufgaben
+                                    </h3>
+                                    <div class="drop-zone space-y-2 min-h-64" id="pool">
+                                        ${poolTasks.map((t, i) => `
+                                            <div class="drag-item bg-white border-2 border-gray-300 rounded-lg p-3 text-sm cursor-move" draggable="true" data-task="${i}">
+                                                ${t.text}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- Stadtteam -->
+                                <div class="bg-purple-50 rounded-xl p-4 border-2 border-purple-300">
+                                    <h3 class="font-bold text-purple-800 mb-4 flex items-center gap-2">
+                                        <span>🏢</span> Stadtteam
+                                    </h3>
+                                    <div class="drop-zone space-y-2 min-h-64 bg-white rounded-lg p-2" id="stadtteam">
+                                        ${stadtTeam.map((t, i) => `
+                                            <div class="drag-item bg-purple-100 border-2 border-purple-300 rounded-lg p-3 text-sm cursor-move" draggable="true" data-task="${i}">
+                                                ${t.text}
+                                            </div>
+                                        `).join('')}
+                                        ${stadtTeam.length === 0 ? '<p class="text-gray-400 text-center py-8 text-sm">Hier hinziehen</p>' : ''}
+                                    </div>
+                                </div>
+
+                                <!-- Vorfeldteam -->
+                                <div class="bg-blue-50 rounded-xl p-4 border-2 border-blue-300">
+                                    <h3 class="font-bold text-blue-800 mb-4 flex items-center gap-2">
+                                        <span>✈️</span> Vorfeldteam
+                                    </h3>
+                                    <div class="drop-zone space-y-2 min-h-64 bg-white rounded-lg p-2" id="vorfeldteam">
+                                        ${vorfeldTeam.map((t, i) => `
+                                            <div class="drag-item bg-blue-100 border-2 border-blue-300 rounded-lg p-3 text-sm cursor-move" draggable="true" data-task="${i}">
+                                                ${t.text}
+                                            </div>
+                                        `).join('')}
+                                        ${vorfeldTeam.length === 0 ? '<p class="text-gray-400 text-center py-8 text-sm">Hier hinziehen</p>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 mt-6">
+                                <button onclick="checkTeamAssignment()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition">
+                                    ✓ Prüfen
+                                </button>
+                                <button onclick="resetTeamChallenge()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-bold transition">
+                                    🔄 Zurücksetzen
+                                </button>
+                            </div>
+
+                            <div id="teamFeedback" class="mt-6"></div>
+                        </div>
+                    </div>
+                `;
+
+                setupTeamDrag();
+            }
+
+            function setupTeamDrag() {
+                let draggedElement = null;
+                let sourceZone = null;
+
+                document.querySelectorAll('.drag-item').forEach(item => {
+                    item.addEventListener('dragstart', function() {
+                        draggedElement = this;
+                        sourceZone = this.closest('.drop-zone');
+                        this.classList.add('dragging');
+                    });
+
+                    item.addEventListener('dragend', function() {
+                        this.classList.remove('dragging');
+                    });
+                });
+
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    zone.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        this.classList.add('drag-over');
+                    });
+
+                    zone.addEventListener('dragleave', function() {
+                        this.classList.remove('drag-over');
+                    });
+
+                    zone.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('drag-over');
+                        
+                        if (!draggedElement) return;
+
+                        const taskText = draggedElement.textContent.trim();
+                        const task = tasks.find(t => t.text === taskText);
+                        
+                        // Remove from all arrays
+                        stadtTeam = stadtTeam.filter(t => t.text !== taskText);
+                        vorfeldTeam = vorfeldTeam.filter(t => t.text !== taskText);
+                        
+                        // Add to target
+                        if (this.id === 'stadtteam') {
+                            stadtTeam.push(task);
+                        } else if (this.id === 'vorfeldteam') {
+                            vorfeldTeam.push(task);
+                        }
+                        
+                        render();
+                    });
+                });
+            }
+
+            window.checkTeamAssignment = function() {
+                const stadtCorrect = stadtTeam.filter(t => t.team === 'stadt').length;
+                const stadtWrong = stadtTeam.filter(t => t.team !== 'stadt').length;
+                const vorfeldCorrect = vorfeldTeam.filter(t => t.team === 'vorfeld').length;
+                const vorfeldWrong = vorfeldTeam.filter(t => t.team !== 'vorfeld').length;
+                
+                const totalCorrect = stadtCorrect + vorfeldCorrect;
+                const remaining = tasks.length - stadtTeam.length - vorfeldTeam.length;
+                
+                const feedback = document.getElementById('teamFeedback');
+                
+                if (totalCorrect === tasks.length && remaining === 0) {
+                    feedback.innerHTML = `
+                        <div class="bg-green-100 border-l-4 border-green-500 p-6 rounded-lg">
+                            <p class="text-green-800 font-bold text-xl mb-2">🎉 Perfekt!</p>
+                            <p class="text-green-700">Alle Aufgaben wurden richtig zugeordnet!</p>
+                            <button onclick="completeLevel(3)" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold w-full transition">
+                                Level abschließen
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    feedback.innerHTML = `
+                        <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-6">
+                            <h4 class="font-bold text-blue-900 mb-4">📊 Ergebnis:</h4>
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div class="bg-purple-100 rounded-lg p-3">
+                                    <p class="font-semibold text-purple-800 mb-1">Stadtteam</p>
+                                    <p class="text-sm text-green-700">✓ ${stadtCorrect} richtig</p>
+                                    <p class="text-sm text-red-700">✗ ${stadtWrong} falsch</p>
+                                </div>
+                                <div class="bg-blue-100 rounded-lg p-3">
+                                    <p class="font-semibold text-blue-800 mb-1">Vorfeldteam</p>
+                                    <p class="text-sm text-green-700">✓ ${vorfeldCorrect} richtig</p>
+                                    <p class="text-sm text-red-700">✗ ${vorfeldWrong} falsch</p>
+                                </div>
+                            </div>
+                            ${remaining > 0 ? `<p class="text-orange-700 text-center">⚠️ Noch ${remaining} Aufgabe(n) nicht zugeordnet</p>` : ''}
+                            <p class="text-blue-800 text-center font-semibold mt-2">Gesamt: ${totalCorrect} / ${tasks.length}</p>
+                        </div>
+                    `;
+                }
+            };
+
+            window.resetTeamChallenge = function() {
+                stadtTeam = [];
+                vorfeldTeam = [];
+                shuffled = [...tasks].sort(() => Math.random() - 0.5);
+                document.getElementById('teamFeedback').innerHTML = '';
+                render();
+            };
+
+            render();
+        }
+
+        // LEVEL 5: WCHR Expert
+        function loadLevel5() {
+            const wchrQuestions = [
+                {
+                    q: "Was bedeutet WCHR?",
+                    options: ["Wheelchair Ramp", "Wheelchair", "Wheelchair Required", "Kann gehen, aber nicht weit"],
+                    correct: 3,
+                    explanation: "WCHR = Kann gehen, aber nicht lange Strecken/Treppen"
+                },
+                {
+                    q: "Was bedeutet WCHC?",
+                    options: ["Wheelchair Complete", "Wheelchair Cabin - kann nicht gehen", "Wheelchair Carry", "Wheelchair Chair"],
+                    correct: 1,
+                    explanation: "WCHC = Cabin - Passagier kann nicht gehen und muss zum/vom Sitz getragen werden"
+                },
+                {
+                    q: "Was bedeutet WCHS?",
+                    options: ["Wheelchair Stairs", "Wheelchair Service", "Wheelchair Special", "Wheelchair Stairs - Treppen nicht möglich"],
+                    correct: 3,
+                    explanation: "WCHS = Stairs - Passagier kann gehen, aber keine Treppen"
+                },
+                {
+                    q: "Warum sind Leihrollis so wichtig?",
+                    options: [
+                        "Sind teuer",
+                        "Werden ständig gebraucht - müssen sofort zurück",
+                        "Müssen gereinigt werden",
+                        "Sind schwer"
+                    ],
+                    correct: 1,
+                    explanation: "Leihrollis sind begrenzt verfügbar und werden ständig gebraucht - IMMER sofort zurückbringen!"
+                },
+                {
+                    q: "Was hat sich durch die EU-Verordnung geändert?",
+                    options: [
+                        "Neue WCHR-Kategorien",
+                        "Bessere Dokumentation und schnellere Response-Zeiten",
+                        "Mehr Geld",
+                        "Weniger Arbeit"
+                    ],
+                    correct: 1,
+                    explanation: "EU-Verordnung verbessert die Dokumentation und definiert klare Response-Zeiten"
+                },
+                {
+                    q: "Was muss bei WCHR-Service dokumentiert werden?",
+                    options: [
+                        "Nur die Uhrzeit",
+                        "Alles: Zeiten, Abholorte, Übergabe, Besonderheiten",
+                        "Gar nichts",
+                        "Nur der Name"
+                    ],
+                    correct: 1,
+                    explanation: "Vollständige Dokumentation ist Pflicht: wann, wo, wer, was, Besonderheiten"
+                },
+                {
+                    q: "Wann muss ein WCHR-Passagier abgeholt werden?",
+                    options: [
+                        "Irgendwann",
+                        "Innerhalb der definierten Service-Zeiten laut EU-VO",
+                        "Nach 30 Minuten",
+                        "Wenn Zeit ist"
+                    ],
+                    correct: 1,
+                    explanation: "Die EU-Verordnung definiert klare Service-Zeiten, die eingehalten werden müssen"
+                },
+                {
+                    q: "Was tun, wenn du einen Passagier nicht rechtzeitig abholen kannst?",
+                    options: [
+                        "Einfach ignorieren",
+                        "Sofort Vorgesetzten informieren",
+                        "Später machen",
+                        "Passagier anrufen"
+                    ],
+                    correct: 1,
+                    explanation: "Bei Problemen SOFORT Bescheid geben, damit Lösung gefunden werden kann!"
+                }
+            ];
+
+            let currentQ = 0;
+            let score = 0;
+
+            function showWCHRQuestion() {
+                if (currentQ >= wchrQuestions.length) {
+                    const percentage = (score / wchrQuestions.length) * 100;
+                    const stars = percentage >= 87.5 ? 3 : percentage >= 62.5 ? 2 : 1;
+                    completeLevel(stars);
+                    return;
+                }
+
+                const q = wchrQuestions[currentQ];
+                document.getElementById('gameScreen').innerHTML = `
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-lg p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <button onclick="returnToLevels()" class="text-gray-600 hover:text-gray-800 font-semibold">
+                                    ← Abbrechen
+                                </button>
+                                <div class="text-sm font-semibold text-gray-600">
+                                    Frage ${currentQ + 1} von ${wchrQuestions.length}
+                                </div>
+                            </div>
+
+                            <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded-lg mb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-2xl">♿</span>
+                                    <h3 class="text-xl font-bold text-pink-900">WCHR Expert Level</h3>
+                                </div>
+                                <p class="text-pink-800 text-sm">Teste dein Wissen über die neuen EU-Verordnungen</p>
+                            </div>
+
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">${q.q}</h3>
+
+                            <div class="space-y-3" id="wchrOptions">
+                                ${q.options.map((opt, i) => `
+                                    <div class="quiz-option border-2 border-gray-200 rounded-lg p-4" onclick="selectWCHRAnswer(${i})">
+                                        <span class="font-semibold">${String.fromCharCode(65 + i)}.</span> ${opt}
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div id="wchrFeedback" class="mt-6 hidden"></div>
+
+                            <div class="mt-6 text-center text-gray-600">
+                                Score: ${score} / ${currentQ}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            window.selectWCHRAnswer = function(index) {
+                const q = wchrQuestions[currentQ];
+                const options = document.querySelectorAll('.quiz-option');
+                const feedback = document.getElementById('wchrFeedback');
+                
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                
+                if (index === q.correct) {
+                    options[index].classList.add('correct');
+                    score++;
+                    feedback.className = 'mt-6 bg-green-100 border-l-4 border-green-500 p-4 rounded';
+                    feedback.innerHTML = `
+                        <p class="text-green-800 font-semibold">✓ Richtig!</p>
+                        <p class="text-green-700 text-sm mt-1">${q.explanation}</p>
+                    `;
+                } else {
+                    options[index].classList.add('wrong');
+                    options[q.correct].classList.add('correct');
+                    feedback.className = 'mt-6 bg-red-100 border-l-4 border-red-500 p-4 rounded';
+                    feedback.innerHTML = `
+                        <p class="text-red-800 font-semibold">✗ Falsch</p>
+                        <p class="text-red-700 text-sm mt-1">${q.explanation}</p>
+                    `;
+                }
+                
+                feedback.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    const btn = document.createElement('button');
+                    btn.className = 'mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold w-full transition';
+                    btn.textContent = currentQ < wchrQuestions.length - 1 ? 'Nächste Frage →' : 'Ergebnis';
+                    btn.onclick = () => {
+                        currentQ++;
+                        showWCHRQuestion();
+                    };
+                    feedback.appendChild(btn);
+                }, 500);
+            };
+
+            showWCHRQuestion();
+        }
+
+        // LEVEL 6: Memory Challenge
+        function loadLevel6() {
+            const pairs = [
+                { type: 'image', content: 'Disregarden.jpg', match: 'text', matchContent: 'Auftrag ignorieren' },
+                { type: 'image', content: 'Inbound.jpg', match: 'text', matchContent: 'Ankommende Flüge' },
+                { type: 'image', content: 'Outbounds.jpg', match: 'text', matchContent: 'Abfliegende Flüge' },
+                { type: 'image', content: 'Tasks.jpg', match: 'text', matchContent: 'Aufgaben-Übersicht' },
+                { type: 'image', content: 'Bordkarte Scannen.jpg', match: 'text', matchContent: 'Bordkarte scannen' },
+                { type: 'image', content: 'Transferieren erster Schritt.jpg', match: 'text', matchContent: 'Auftrag transferieren' },
+                { type: 'image', content: 'Notes.jpg', match: 'text', matchContent: 'Notizen erfassen' },
+                { type: 'image', content: 'Auftragsübersicht.jpg', match: 'text', matchContent: 'Alle Aufträge' },
+            ];
+
+            let cards = [];
+            pairs.forEach(pair => {
+                cards.push({ ...pair, id: pair.content + '_img' });
+                cards.push({ type: pair.match, content: pair.matchContent, id: pair.content + '_text', matchId: pair.content + '_img' });
+            });
+            cards = cards.sort(() => Math.random() - 0.5);
+
+            let flipped = [];
+            let matched = [];
+            let moves = 0;
+
+            function render() {
+                document.getElementById('gameScreen').innerHTML = `
+                    <div class="max-w-5xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-lg p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <button onclick="returnToLevels()" class="text-gray-600 hover:text-gray-800 font-semibold">
+                                    ← Abbrechen
+                                </button>
+                                <div class="text-gray-600 font-semibold">
+                                    Züge: <span id="moveCount">${moves}</span> | Paare: <span id="pairCount">${matched.length / 2} / ${pairs.length}</span>
+                                </div>
+                            </div>
+
+                            <h3 class="text-2xl font-bold text-center text-gray-800 mb-6">🧠 Finde die passenden Paare!</h3>
+                            <p class="text-center text-gray-600 mb-6">Klicke auf Karten um sie umzudrehen. Finde Screenshot und Funktion!</p>
+
+                            <div class="grid grid-cols-4 gap-3" id="memoryGrid">
+                                ${cards.map((card, i) => `
+                                    <div class="memory-card aspect-square ${matched.includes(card.id) ? 'invisible' : ''} ${flipped.includes(i) ? 'flipped' : ''}" 
+                                         onclick="flipCard(${i})">
+                                        <div class="memory-card-inner">
+                                            <div class="memory-card-front bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                                <span class="text-4xl text-white">?</span>
+                                            </div>
+                                            <div class="memory-card-back bg-white border-2 border-gray-300 flex items-center justify-center p-2">
+                                                ${card.type === 'image' 
+                                                    ? `<img src="${card.content}" class="w-full h-full object-cover rounded" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2210%22>📷</text></svg>'">` 
+                                                    : `<span class="text-center text-xs font-semibold text-gray-800 px-1">${card.content}</span>`
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            window.flipCard = function(index) {
+                if (flipped.length >= 2 || flipped.includes(index) || matched.includes(cards[index].id)) return;
+                
+                flipped.push(index);
+                render();
+
+                if (flipped.length === 2) {
+                    moves++;
+                    const card1 = cards[flipped[0]];
+                    const card2 = cards[flipped[1]];
+                    
+                    setTimeout(() => {
+                        // Check match
+                        const isMatch = (card1.id === card2.matchId) || (card2.id === card1.matchId);
+                        
+                        if (isMatch) {
+                            matched.push(card1.id, card2.id);
+                            flipped = [];
+                            render();
+                            
+                            // Check if all matched
+                            if (matched.length === cards.length) {
+                                setTimeout(() => {
+                                    const stars = moves <= 20 ? 3 : moves <= 30 ? 2 : 1;
+                                    completeLevel(stars);
+                                }, 500);
+                            }
+                        } else {
+                            flipped = [];
+                            render();
+                        }
+                    }, 1000);
+                }
+            };
+
+            render();
+        }
+
+        // Initialize game
+        loadProgress();
+    </script>
+</body>
+</html>

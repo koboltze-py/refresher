@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alltags-Comic Story - DRK Refresher 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap');
+        
+        * {
+            font-family: 'Comic Neue', cursive;
+        }
+        
+        .comic-title {
+            font-family: 'Bangers', cursive;
+        }
+        
+        .comic-panel {
+            border: 4px solid #000;
+            background: white;
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .speech-bubble {
+            position: relative;
+            background: white;
+            border: 3px solid #000;
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 30px;
+            border: 12px solid transparent;
+            border-top-color: #000;
+            border-bottom: 0;
+            margin-left: -12px;
+        }
+        
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 30px;
+            border: 11px solid transparent;
+            border-top-color: white;
+            border-bottom: 0;
+            margin-left: -11px;
+        }
+        
+        .thought-bubble {
+            position: relative;
+            background: white;
+            border: 3px solid #000;
+            border-radius: 50%;
+            padding: 20px;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 20px;
+            width: 15px;
+            height: 15px;
+            background: white;
+            border: 3px solid #000;
+            border-radius: 50%;
+        }
+        
+        .thought-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 10px;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border: 3px solid #000;
+            border-radius: 50%;
+        }
+        
+        .stick-figure {
+            width: 80px;
+            height: 120px;
+            position: relative;
+        }
+        
+        .stick-head {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #000;
+            border-radius: 50%;
+            background: #ffe0bd;
+            position: absolute;
+            top: 0;
+            left: 25px;
+        }
+        
+        .stick-body {
+            width: 3px;
+            height: 40px;
+            background: #000;
+            position: absolute;
+            top: 30px;
+            left: 38.5px;
+        }
+        
+        .stick-arm-left {
+            width: 30px;
+            height: 3px;
+            background: #000;
+            position: absolute;
+            top: 45px;
+            left: 10px;
+            transform: rotate(-20deg);
+        }
+        
+        .stick-arm-right {
+            width: 30px;
+            height: 3px;
+            background: #000;
+            position: absolute;
+            top: 45px;
+            right: 10px;
+            transform: rotate(20deg);
+        }
+        
+        .stick-leg-left {
+            width: 30px;
+            height: 3px;
+            background: #000;
+            position: absolute;
+            top: 70px;
+            left: 15px;
+            transform: rotate(35deg);
+        }
+        
+        .stick-leg-right {
+            width: 30px;
+            height: 3px;
+            background: #000;
+            position: absolute;
+            top: 70px;
+            right: 15px;
+            transform: rotate(-35deg);
+        }
+        
+        .panel-hidden {
+            display: none;
+        }
+        
+        .comic-bg-airport {
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 50%, #90EE90 50%, #90EE90 100%);
+        }
+        
+        .comic-bg-terminal {
+            background: linear-gradient(to bottom, #E0E0E0 0%, #E0E0E0 70%, #C0C0C0 70%, #C0C0C0 100%);
+        }
+        
+        .comic-bg-panic {
+            background: linear-gradient(to bottom, #FF6B6B 0%, #FFE066 100%);
+        }
+        
+        .wheelchair-emoji {
+            font-size: 48px;
+            display: inline-block;
+        }
+        
+        .zoom-in {
+            animation: zoomIn 0.5s ease-out;
+        }
+        
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px) rotate(-5deg); }
+            75% { transform: translateX(10px) rotate(5deg); }
+        }
+        
+        .warning-text {
+            color: #DC143C;
+            text-shadow: 2px 2px 0 #FFD700;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .control-button {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+        }
+        
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .control-button:active {
+            transform: translateY(2px);
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-yellow-100 via-orange-100 to-red-100 min-h-screen p-4">
+    <!-- Header -->
+    <div class="max-w-6xl mx-auto mb-8">
+        <h1 class="comic-title text-6xl text-center text-gray-800 mb-2 transform -rotate-2">
+            📚 ALLTAGS-COMIC STORY 📚
+        </h1>
+        <p class="text-center text-xl font-bold text-gray-700">Ein Tag im Leben eines DRK-Mitarbeiters</p>
+    </div>
+    
+    <!-- Controls -->
+    <div class="max-w-6xl mx-auto mb-6 flex justify-center gap-4 flex-wrap">
+        <button onclick="previousScene()" class="control-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
+            ⬅️ Zurück
+        </button>
+        <button id="playPauseBtn" onclick="togglePlayPause()" class="control-button bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg">
+            ▶️ Play
+        </button>
+        <button onclick="nextScene()" class="control-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
+            Weiter ➡️
+        </button>
+        <button onclick="resetComic()" class="control-button bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg">
+            🔄 Neustart
+        </button>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="max-w-6xl mx-auto mb-6">
+        <div class="bg-white border-4 border-black rounded-full h-8 shadow-lg">
+            <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-green-500 h-full rounded-full transition-all duration-500 flex items-center justify-center">
+                <span id="progressText" class="text-white font-bold text-sm">Szene 1 / 8</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Comic Panels Container -->
+    <div class="max-w-6xl mx-auto">
+        <!-- Szene 1: LEIHROLLIS - Das Problem -->
+        <div id="scene-1" class="comic-panel p-8 mb-8 comic-bg-airport">
+            <h2 class="comic-title text-4xl mb-6 text-center text-red-600 warning-text">
+                ⚠️ ACHTUNG: LEIHROLLSTÜHLE! ⚠️
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="flex flex-col items-center">
+                    <div class="wheelchair-emoji shake">♿</div>
+                    <div class="wheelchair-emoji shake" style="animation-delay: 0.2s;">♿</div>
+                    <div class="wheelchair-emoji shake" style="animation-delay: 0.4s;">♿</div>
+                    <p class="text-center mt-4 text-2xl font-bold">Leihrollstühle warten...</p>
+                </div>
+                <div>
+                    <div class="speech-bubble text-lg font-bold mb-6">
+                        "Diese Rollstühle sind SUPER wichtig! Sie müssen SOFORT nach Gebrauch zurückgebracht werden!"
+                    </div>
+                    <div class="bg-red-100 border-4 border-red-600 p-4 rounded-lg">
+                        <p class="text-xl font-bold text-red-800 text-center">
+                            🚨 DRINGEND GEBRAUCHT! 🚨
+                        </p>
+                        <p class="text-center mt-2">Andere Passagiere warten darauf!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Szene 2: LEIHROLLIS - Der Fehler -->
+        <div id="scene-2" class="comic-panel p-8 mb-8 comic-bg-terminal panel-hidden">
+            <h2 class="comic-title text-4xl mb-6 text-center text-blue-800">
+                😰 OH NEIN! DER FEHLER!
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="stick-figure">
+                        <div class="stick-head">
+                            <div class="text-2xl text-center leading-6">😱</div>
+                        </div>
+                        <div class="stick-body"></div>
+                        <div class="stick-arm-left"></div>
+                        <div class="stick-arm-right" style="transform: rotate(45deg);"></div>
+                        <div class="stick-leg-left"></div>
+                        <div class="stick-leg-right"></div>
+                    </div>
+                    <p class="text-xl font-bold">Max (DRK-Mitarbeiter)</p>
+                    <div class="thought-bubble text-center max-w-xs">
+                        "Ups... habe ich den Rolli zurückgebracht? 🤔"
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-yellow-100 border-4 border-yellow-600 p-6 rounded-lg mb-4">
+                        <p class="text-2xl font-bold text-center mb-2">❌ FALSCH:</p>
+                        <p class="text-lg">Max lässt den Rollstuhl irgendwo stehen und geht weiter...</p>
+                    </div>
+                    <div class="speech-bubble text-lg text-red-600 font-bold">
+                        "Ach, den bringe ich später zurück... Das wird schon passen!"
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Szene 3: LEIHROLLIS - Das Chaos -->
+        <div id="scene-3" class="comic-panel p-8 mb-8 comic-bg-panic panel-hidden">
+            <h2 class="comic-title text-4xl mb-6 text-center text-red-800">
+                🔥 CHAOS IM TERMINAL! 🔥
+            </h2>
+            <div class="text-center mb-8">
+                <div class="text-8xl mb-4">😡😰😭</div>
+                <p class="text-3xl font-bold mb-4">ALLE ROLLSTÜHLE WEG!</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white border-4 border-black p-4 rounded-lg">
+                    <div class="text-4xl mb-2">👴</div>
+                    <div class="speech-bubble text-sm">
+                        "Ich brauche JETZT einen Rollstuhl! Mein Flug geht gleich!"
+                    </div>
+                </div>
+                <div class="bg-white border-4 border-black p-4 rounded-lg">
+                    <div class="text-4xl mb-2">👵</div>
+                    <div class="speech-bubble text-sm">
+                        "Wo sind denn alle Rollstühle? Das dauert ja ewig!"
+                    </div>
+                </div>
+                <div class="bg-white border-4 border-black p-4 rounded-lg">
+                    <div class="text-4xl mb-2">😤</div>
+                    <div class="speech-bubble text-sm">
+                        "Das ist doch keine Organisation! Unglaublich!"
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Szene 4: LEIHROLLIS - Die Lösung -->
+        <div id="scene-4" class="comic-panel p-8 mb-8 comic-bg-terminal panel-hidden">
+            <h2 class="comic-title text-4xl mb-6 text-center text-green-700">
+                ✅ SO MACHT MAN ES RICHTIG!
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="stick-figure">
+                        <div class="stick-head">
+                            <div class="text-2xl text-center leading-6">😊</div>
+                        </div>
+                        <div class="stick-body"></div>
+                        <div class="stick-arm-left" style="transform: rotate(-45deg);"></div>
+                        <div class="stick-arm-right"></div>
+                        <div class="stick-leg-left"></div>
+                        <div class="stick-leg-right"></div>
+                    </div>
+                    <p class="text-xl font-bold">Lisa (Super-Mitarbeiterin)</p>
+                    <div class="speech-bubble text-center max-w-xs">
+                        "Passagier sicher angekommen! Jetzt SOFORT den Rolli zurückbringen! ✓"
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-green-100 border-4 border-green-600 p-6 rounded-lg">
+                        <p class="text-2xl font-bold text-center mb-4">✓ RICHTIG:</p>
+                        <ul class="space-y-3 text-lg">
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">✓</span>
+                                <span>Passagier am Ziel abgesetzt</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">✓</span>
+                                <span><strong>SOFORT</strong> zurück zum Abstellbereich</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">✓</span>
+                                <span>Ordnungsgemäß abstellen</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">✓</span>
+                                <span>Nächster Passagier kann bedient werden! 🎉</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Szene 5: PÜNKTLICHKEIT -->
+        <div id="scene-5" class="comic-panel p-8 mb-8 comic-bg-airport panel-hidden">
+            <h2 class="comic-title text-4xl mb-6 text-center text-blue-700">
+                ⏰ PÜNKTLICHKEIT IST ALLES!
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-red-100 border-4 border-red-500 p-6 rounded-lg">
+                    <p class="text-2xl font-bold text-center mb-4">❌ FALSCH</p>
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="text-6xl">😴</div>
+                        <div class="speech-bubble text-center">
+                            "Oh, schon so spät? Naja, 5 Minuten zu spät macht ja nichts..."
+                        </div>
+                        <p class="text-lg font-bold text-red-700 text-center">
+                            ❌ Kollegen müssen länger bleiben<br>
+                            ❌ Übergabe funktioniert nicht<br>
+                            ❌ Team ist unvollständig
+                        </p>
+                    </div>
+                </div>
+                <div class="bg-green-100 border-4 border-green-500 p-6 rounded-lg">
+                    <p class="text-2xl font-bold text-center mb-4">✓ RICHTIG</p>
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="text-6xl">😊</div>
+                        <div class="speech-bubble text-center">
+                            "15 Minuten vor Schichtbeginn da sein - kein Problem!"
+                        </div>
+                        <p class="text-lg font-bold text-green-700 text-center">
+                            ✓ Rechtzeitige Übergabe<br>
+                            ✓ Zeit für Vorbereitung<br>
+                            ✓ Respekt für Kollegen
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 bg-orange-100 border-4 border-orange-500 p-4 rounded-lg">
+                <p class="text-xl font-bold text-center">
+                    📞 Bei Verspätung: SOFORT anrufen, nicht einfach zu spät kommen!
+                </p>
+            </div>
+        </div>
+        
+        <!-- Szene 6: TAUSCHANTRÄGE -->
+        <div id="scene-6" class="comic-panel p-8 mb-8 comic-bg-terminal panel-hidden">
+            <h2 class="comic-title text-4xl mb-6 text-center text-purple-700">
+                🔄 SCHICHTTAUSCH RICHTIG MACHEN!
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-red-100 border-4 border-red-500 p-6 rounded-lg">
+                    <p class="text-2xl font-bold text-center mb-4">❌ FALSCH</p>
+                    <div class="text-center space-y-4">
+                        <div class="text-6xl">😬</div>
+                        <div class="speech-bubble">
+                            "Morgen tausche ich mit Tom - mache ich kurz vor der Schicht..."
+                        </div>
+                        <div class="bg-white p-3 rounded border-2 border-red-800">
+                            <p class="font-bold text-red-800">Probleme:</p>
+                            <ul class="text-left text-sm mt-2 space-y-1">
+                                <li>❌ Keine Zeit für Genehmigung</li>
+                                <li>❌ Chaos in der Planung</li>
+                                <li>❌ Unfair für Teamleitung</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-green-100 border-4 border-green-500 p-6 rounded-lg">
+                    <p class="text-2xl font-bold text-center mb-4">✓ RICHTIG</p>
+                    <div class="text-center space-y-4">
+                        <div class="text-6xl">🤓</div>
+                        <div class="speech-bubble">
+                            "2 Wochen vorher Antrag stellen und Genehmigung abwarten!"
+                        </div>
+                        <div class="bg-white p-3 rounded border-2 border-green-800">
+                            <p class="font-bold text-green-800">Vorteile:</p>
+                            <ul class="text-left text-sm mt-2 space-y-1">
+                                <li>✓ Zeit für Prüfung</li>
+                                <li>✓ Klare Planung</li>
+                                <li>✓ Professionell</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 bg-yellow-100 border-4 border-yellow-600 p-4 rounded-lg text-center">
+                <p class="text-xl font-bold">⚠️ MINDESTENS 2 WOCHEN VORHER + GENEHMIGUNG ABWARTEN!</p>
+            </div>
+        </div>
+        
+        <!-- Szene 7: KRANKMELDUNGEN -->
+        <div id="scene-7" class="comic-panel p-8 mb-8 comic-bg-airport panel-hidden">
+            <h2 class="comic-title text-4xl mb-6 text-center text-orange-700">
+                🤒 RICHTIG KRANKMELDEN!
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-red-100 border-4 border-red-500 p-6 rounded-lg">
+                    <p class="text-2xl font-bold text-center mb-4">❌ FALSCH</p>
+                    <div class="space-y-4">
+                        <div class="text-center text-6xl">🤧</div>
+                        <div class="bg-white p-3 rounded border-2 border-black">
+                            <p class="text-sm text-gray-500">SMS um 07:45 Uhr</p>
+                            <p class="mt-2">"Hi, bin krank. Komme nicht. LG"</p>
+                        </div>
+                        <div class="text-center font-bold text-red-800 text-lg">
+                            ❌ Zu spät!<br>
+                            ❌ Falsche Methode!<br>
+                            ❌ Keine Details!
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-green-100 border-4 border-green-500 p-6 rounded-lg">
+                    <p class="text-2xl font-bold text-center mb-4">✓ RICHTIG</p>
+                    <div class="space-y-4">
+                        <div class="text-center text-6xl">📞</div>
+                        <div class="speech-bubble">
+                            "Guten Morgen, hier ist Max. Mir geht es leider nicht gut, ich kann heute nicht kommen. Tut mir leid!"
+                        </div>
+                        <div class="text-center font-bold text-green-800 text-lg">
+                            ✓ SOFORT beim Aufwachen<br>
+                            ✓ ANRUFEN (kein SMS!)<br>
+                            ✓ Teamleitung informieren<br>
+                            ✓ AU-Bescheinigung nachreichen
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Szene 8: TEAM-UNTERSCHIEDE -->
+        <div id="scene-8" class="comic-panel p-8 mb-8 comic-bg-terminal panel-hidden">
+            <h2 class="comic-title text-4xl mb-6 text-center text-indigo-700">
+                👥 STADTTEAM vs. VORFELDTEAM
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-purple-100 border-4 border-purple-500 p-6 rounded-lg">
+                    <div class="text-center mb-4">
+                        <div class="text-6xl mb-2">🏢</div>
+                        <p class="text-2xl font-bold text-purple-800">STADTTEAM</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border-2 border-purple-800">
+                        <ul class="space-y-3 text-lg">
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">🎫</span>
+                                <span><strong>Terminal</strong> - Im Gebäude</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">✈️</span>
+                                <span><strong>Check-in</strong> Bereich</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">🧳</span>
+                                <span><strong>Gepäckausgabe</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">🚪</span>
+                                <span><strong>Gate-Bereich</strong></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-blue-100 border-4 border-blue-500 p-6 rounded-lg">
+                    <div class="text-center mb-4">
+                        <div class="text-6xl mb-2">✈️</div>
+                        <p class="text-2xl font-bold text-blue-800">VORFELDTEAM</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border-2 border-blue-800">
+                        <ul class="space-y-3 text-lg">
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">🛫</span>
+                                <span><strong>Flugzeug</strong> - Direkt am Flieger</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">🚶</span>
+                                <span><strong>Boarding</strong> & Aussteigen</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">🚌</span>
+                                <span><strong>Apron</strong> (Vorfeld)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-2xl">🌤️</span>
+                                <span><strong>Draußen</strong> bei jedem Wetter</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 bg-green-100 border-4 border-green-600 p-4 rounded-lg text-center">
+                <p class="text-2xl font-bold text-green-800">
+                    🤝 Beide Teams arbeiten zusammen für den perfekten Service!
+                </p>
+            </div>
+        </div>
+        
+        <!-- Abschluss / Ende Szene -->
+        <div id="scene-end" class="comic-panel p-8 mb-8 comic-bg-airport panel-hidden">
+            <div class="text-center">
+                <h2 class="comic-title text-5xl mb-8 text-green-700">
+                    🎉 SUPER! DU HAST ES GESCHAFFT! 🎉
+                </h2>
+                <div class="text-8xl mb-6">⭐</div>
+                <div class="bg-white border-4 border-black rounded-lg p-8 max-w-2xl mx-auto mb-8">
+                    <h3 class="text-3xl font-bold mb-6">Das Wichtigste zusammengefasst:</h3>
+                    <ul class="text-left text-lg space-y-3">
+                        <li class="flex items-start gap-3">
+                            <span class="text-2xl">♿</span>
+                            <span><strong>Leihrollstühle</strong> SOFORT zurückbringen!</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-2xl">⏰</span>
+                            <span><strong>Pünktlichkeit:</strong> 15 Min vorher da sein</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-2xl">🔄</span>
+                            <span><strong>Tauschanträge:</strong> Mind. 2 Wochen vorher</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-2xl">📞</span>
+                            <span><strong>Krankmeldung:</strong> Sofort anrufen!</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-2xl">👥</span>
+                            <span><strong>Teams:</strong> Stadt (Terminal) & Vorfeld (Flugzeug)</span>
+                        </li>
+                    </ul>
+                </div>
+                <button onclick="window.location.href='index.html#alltag'" class="control-button bg-blue-600 hover:bg-blue-700 text-white text-2xl font-bold py-4 px-8 rounded-lg">
+                    🏠 Zurück zur Übersicht
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentScene = 1;
+        const totalScenes = 8;
+        let isPlaying = false;
+        let autoPlayInterval = null;
+        
+        function showScene(sceneNumber) {
+            // Hide all scenes
+            for (let i = 1; i <= totalScenes; i++) {
+                const scene = document.getElementById(`scene-${i}`);
+                if (scene) {
+                    scene.classList.add('panel-hidden');
+                }
+            }
+            
+            // Hide end scene
+            const endScene = document.getElementById('scene-end');
+            if (endScene) {
+                endScene.classList.add('panel-hidden');
+            }
+            
+            // Show current scene or end scene
+            if (sceneNumber > totalScenes) {
+                if (endScene) {
+                    endScene.classList.remove('panel-hidden');
+                    endScene.classList.add('zoom-in');
+                }
+                currentScene = totalScenes + 1;
+                stopAutoPlay();
+            } else {
+                const scene = document.getElementById(`scene-${sceneNumber}`);
+                if (scene) {
+                    scene.classList.remove('panel-hidden');
+                    scene.classList.add('zoom-in');
+                }
+                currentScene = sceneNumber;
+            }
+            
+            updateProgress();
+            
+            // Scroll to top of the scene
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function nextScene() {
+            if (currentScene <= totalScenes) {
+                showScene(currentScene + 1);
+            }
+        }
+        
+        function previousScene() {
+            if (currentScene > 1) {
+                showScene(currentScene - 1);
+            }
+        }
+        
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playPauseBtn');
+            
+            if (isPlaying) {
+                btn.innerHTML = '⏸️ Pause';
+                btn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                btn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+                startAutoPlay();
+            } else {
+                btn.innerHTML = '▶️ Play';
+                btn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+                btn.classList.add('bg-green-500', 'hover:bg-green-600');
+                stopAutoPlay();
+            }
+        }
+        
+        function startAutoPlay() {
+            autoPlayInterval = setInterval(() => {
+                if (currentScene <= totalScenes) {
+                    nextScene();
+                } else {
+                    stopAutoPlay();
+                }
+            }, 5000); // 5 seconds per scene
+        }
+        
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            isPlaying = false;
+            const btn = document.getElementById('playPauseBtn');
+            btn.innerHTML = '▶️ Play';
+            btn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+            btn.classList.add('bg-green-500', 'hover:bg-green-600');
+        }
+        
+        function resetComic() {
+            stopAutoPlay();
+            showScene(1);
+        }
+        
+        function updateProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const percentage = (currentScene / (totalScenes + 1)) * 100;
+            
+            progressBar.style.width = `${percentage}%`;
+            
+            if (currentScene > totalScenes) {
+                progressText.textContent = 'Abgeschlossen! 🎉';
+            } else {
+                progressText.textContent = `Szene ${currentScene} / ${totalScenes}`;
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextScene();
+            } else if (e.key === 'ArrowLeft') {
+                previousScene();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                togglePlayPause();
+            }
+        });
+        
+        // Initialize
+        showScene(1);
+    </script>
+</body>
+</html>
