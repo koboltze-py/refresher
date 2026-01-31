@@ -157,16 +157,117 @@
             display: none;
         }
         
+        /* Filmische Panel-Styles */
+        .panel-active {
+            animation: fadeInCinematic 1s ease-in-out;
+        }
+        
+        .panel-exit {
+            animation: fadeOutCinematic 0.8s ease-in-out;
+        }
+        
+        /* Cinematische Übergänge */
+        @keyframes fadeInCinematic {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+            }
+        }
+        
+        @keyframes fadeOutCinematic {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.05);
+                filter: blur(10px);
+            }
+        }
+        
+        /* Letterbox-Effekt für filmisches Gefühl */
+        .letterbox {
+            position: relative;
+        }
+        
+        .letterbox::before,
+        .letterbox::after {
+            content: '';
+            position: fixed;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #000;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .letterbox::before {
+            top: 0;
+        }
+        
+        .letterbox::after {
+            bottom: 0;
+        }
+        
         .comic-bg-airport {
             background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 50%, #90EE90 50%, #90EE90 100%);
+            position: relative;
+            overflow: hidden;
         }
         
         .comic-bg-terminal {
             background: linear-gradient(to bottom, #E0E0E0 0%, #E0E0E0 70%, #C0C0C0 70%, #C0C0C0 100%);
+            position: relative;
+            overflow: hidden;
         }
         
         .comic-bg-panic {
             background: linear-gradient(to bottom, #FF6B6B 0%, #FFE066 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Kamera-Effekte */
+        .camera-pan-left {
+            animation: panLeft 1.5s ease-in-out;
+        }
+        
+        .camera-pan-right {
+            animation: panRight 1.5s ease-in-out;
+        }
+        
+        .camera-zoom-in {
+            animation: cameraZoomIn 1.2s ease-out;
+        }
+        
+        @keyframes panLeft {
+            0% { transform: translateX(30px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes panRight {
+            0% { transform: translateX(-30px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes cameraZoomIn {
+            0% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
         
         .wheelchair-emoji {
@@ -175,7 +276,7 @@
         }
         
         .zoom-in {
-            animation: zoomIn 0.5s ease-out;
+            animation: zoomIn 0.8s ease-out;
         }
         
         @keyframes zoomIn {
@@ -210,6 +311,51 @@
             50% { transform: scale(1.1); }
         }
         
+        /* Filmische Text-Effekte */
+        .slide-in-left {
+            animation: slideInLeft 1s ease-out;
+        }
+        
+        .slide-in-right {
+            animation: slideInRight 1s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            0% {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInRight {
+            0% {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Dramatic Focus */
+        .dramatic-focus {
+            animation: dramaticFocus 2s ease-in-out infinite;
+        }
+        
+        @keyframes dramaticFocus {
+            0%, 100% {
+                box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 8px 8px 30px rgba(0, 0, 0, 0.6), 0 0 50px rgba(255, 215, 0, 0.5);
+            }
+        }
+        
         .control-button {
             border: 3px solid #000;
             box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
@@ -227,13 +373,14 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-yellow-100 via-orange-100 to-red-100 min-h-screen p-4">
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen p-4 letterbox">
     <!-- Header -->
-    <div class="max-w-6xl mx-auto mb-8">
-        <h1 class="comic-title text-6xl text-center text-gray-800 mb-2 transform -rotate-2">
+    <div class="max-w-6xl mx-auto mb-8 camera-zoom-in">
+        <h1 class="comic-title text-6xl text-center text-white mb-2 transform -rotate-2" style="text-shadow: 4px 4px 0 #000, 6px 6px 20px rgba(255,215,0,0.5);">
             📚 ALLTAGS-COMIC STORY 📚
         </h1>
-        <p class="text-center text-xl font-bold text-gray-700">Ein Tag im Leben eines DRK-Mitarbeiters</p>
+        <p class="text-center text-xl font-bold text-yellow-300" style="text-shadow: 2px 2px 4px #000;">Ein Tag im Leben eines DRK-Mitarbeiters</p>
+        <p class="text-center text-sm text-gray-400 mt-2">🎬 Filmische Präsentation 🎬</p>
     </div>
     
     <!-- Controls -->
@@ -639,53 +786,119 @@
         const totalScenes = 8;
         let isPlaying = false;
         let autoPlayInterval = null;
+        let isTransitioning = false;
+        
+        // Cinematische Kamera-Effekte für jede Szene
+        const sceneEffects = {
+            1: 'camera-zoom-in dramatic-focus',
+            2: 'camera-pan-left',
+            3: 'camera-zoom-in',
+            4: 'camera-pan-right',
+            5: 'camera-zoom-in',
+            6: 'camera-pan-left',
+            7: 'camera-pan-right',
+            8: 'camera-zoom-in'
+        };
         
         function showScene(sceneNumber) {
-            // Hide all scenes
-            for (let i = 1; i <= totalScenes; i++) {
-                const scene = document.getElementById(`scene-${i}`);
-                if (scene) {
-                    scene.classList.add('panel-hidden');
+            if (isTransitioning) return; // Verhindere Mehrfach-Klicks während Übergang
+            isTransitioning = true;
+            
+            // Fade-out der aktuellen Szene
+            const currentSceneEl = document.getElementById(`scene-${currentScene}`) || document.getElementById('scene-end');
+            if (currentSceneEl && !currentSceneEl.classList.contains('panel-hidden')) {
+                currentSceneEl.classList.add('panel-exit');
+            }
+            
+            // Warte auf Fade-out Animation
+            setTimeout(() => {
+                // Hide all scenes
+                for (let i = 1; i <= totalScenes; i++) {
+                    const scene = document.getElementById(`scene-${i}`);
+                    if (scene) {
+                        scene.classList.add('panel-hidden');
+                        scene.classList.remove('panel-active', 'panel-exit', 'zoom-in', 'camera-pan-left', 'camera-pan-right', 'camera-zoom-in', 'dramatic-focus');
+                    }
                 }
-            }
-            
-            // Hide end scene
-            const endScene = document.getElementById('scene-end');
-            if (endScene) {
-                endScene.classList.add('panel-hidden');
-            }
-            
-            // Show current scene or end scene
-            if (sceneNumber > totalScenes) {
+                
+                // Hide end scene
+                const endScene = document.getElementById('scene-end');
                 if (endScene) {
-                    endScene.classList.remove('panel-hidden');
-                    endScene.classList.add('zoom-in');
+                    endScene.classList.add('panel-hidden');
+                    endScene.classList.remove('panel-active', 'panel-exit', 'zoom-in', 'camera-zoom-in');
                 }
-                currentScene = totalScenes + 1;
-                stopAutoPlay();
-            } else {
-                const scene = document.getElementById(`scene-${sceneNumber}`);
-                if (scene) {
-                    scene.classList.remove('panel-hidden');
-                    scene.classList.add('zoom-in');
+                
+                // Show current scene or end scene
+                if (sceneNumber > totalScenes) {
+                    if (endScene) {
+                        endScene.classList.remove('panel-hidden');
+                        endScene.classList.add('panel-active', 'camera-zoom-in');
+                    }
+                    currentScene = totalScenes + 1;
+                    stopAutoPlay();
+                } else {
+                    const scene = document.getElementById(`scene-${sceneNumber}`);
+                    if (scene) {
+                        scene.classList.remove('panel-hidden');
+                        scene.classList.add('panel-active');
+                        
+                        // Füge spezifische Kamera-Effekte hinzu
+                        const effect = sceneEffects[sceneNumber];
+                        if (effect) {
+                            effect.split(' ').forEach(cls => scene.classList.add(cls));
+                        }
+                        
+                        // Animiere Inhalte innerhalb der Szene
+                        animateSceneContent(scene);
+                    }
+                    currentScene = sceneNumber;
                 }
-                currentScene = sceneNumber;
-            }
+                
+                updateProgress();
+                
+                // Scroll to top of the scene
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Reset transition lock
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 300);
+            }, 800); // Wartezeit für Fade-out
+        }
+        
+        // Animiert Inhalte innerhalb einer Szene
+        function animateSceneContent(scene) {
+            // Finde alle speech-bubbles und animiere sie
+            const bubbles = scene.querySelectorAll('.speech-bubble, .thought-bubble');
+            bubbles.forEach((bubble, index) => {
+                bubble.style.opacity = '0';
+                bubble.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    bubble.style.transition = 'all 0.6s ease-out';
+                    bubble.style.opacity = '1';
+                    bubble.style.transform = 'translateY(0)';
+                }, 500 + (index * 200));
+            });
             
-            updateProgress();
-            
-            // Scroll to top of the scene
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Animiere Info-Boxen
+            const boxes = scene.querySelectorAll('.bg-red-100, .bg-green-100, .bg-yellow-100, .bg-blue-100, .bg-purple-100, .bg-orange-100');
+            boxes.forEach((box, index) => {
+                if (index % 2 === 0) {
+                    box.classList.add('slide-in-left');
+                } else {
+                    box.classList.add('slide-in-right');
+                }
+            });
         }
         
         function nextScene() {
-            if (currentScene <= totalScenes) {
+            if (!isTransitioning && currentScene <= totalScenes) {
                 showScene(currentScene + 1);
             }
         }
         
         function previousScene() {
-            if (currentScene > 1) {
+            if (!isTransitioning && currentScene > 1) {
                 showScene(currentScene - 1);
             }
         }
@@ -714,7 +927,7 @@
                 } else {
                     stopAutoPlay();
                 }
-            }, 5000); // 5 seconds per scene
+            }, 6000); // 6 Sekunden pro Szene (länger für filmisches Gefühl)
         }
         
         function stopAutoPlay() {
@@ -731,6 +944,7 @@
         
         function resetComic() {
             stopAutoPlay();
+            isTransitioning = false;
             showScene(1);
         }
         
@@ -740,6 +954,7 @@
             const percentage = (currentScene / (totalScenes + 1)) * 100;
             
             progressBar.style.width = `${percentage}%`;
+            progressBar.style.transition = 'width 0.5s ease-out';
             
             if (currentScene > totalScenes) {
                 progressText.textContent = 'Abgeschlossen! 🎉';
@@ -757,11 +972,15 @@
             } else if (e.key === ' ') {
                 e.preventDefault();
                 togglePlayPause();
+            } else if (e.key === 'Escape') {
+                window.location.href = 'index.html#alltag';
             }
         });
         
-        // Initialize
-        showScene(1);
+        // Initialize mit cinematischer Eröffnung
+        setTimeout(() => {
+            showScene(1);
+        }, 300);
     </script>
 </body>
 </html>
